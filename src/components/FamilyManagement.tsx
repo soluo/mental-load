@@ -91,9 +91,9 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
               Ma famille
@@ -109,22 +109,11 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <UsersIcon className="w-5 h-5 text-slate-600" />
-          <h2 className="text-xl font-medium text-slate-900">
-            Membres du foyer
-          </h2>
-          <span className="text-sm text-slate-500">
-            ({household.members.length})
-          </span>
-        </div>
-
         <div className="space-y-3">
           {household.members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-4 p-4 rounded-lg bg-white hover:bg-slate-100 transition-colors"
             >
               <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
                 <span className="text-slate-700 font-medium text-lg">
@@ -171,7 +160,6 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
             </div>
           )}
         </div>
-      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

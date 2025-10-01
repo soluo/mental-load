@@ -14,10 +14,8 @@ export default function App() {
       <Authenticated>
         <AuthenticatedHeader />
       </Authenticated>
-      <main className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-6xl mx-auto">
-          <Content />
-        </div>
+      <main className="flex-1 flex justify-center p-5">
+        <Content />
       </main>
       <Toaster position="bottom-center" />
     </div>
