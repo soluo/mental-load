@@ -11,14 +11,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MemberSelector } from "@/components/MemberSelector";
-import { LogOut, Users } from "lucide-react";
+import { useActiveMember } from "@/contexts/MemberContext";
+import { LogOut, Users, Check, User } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { Id } from "../../convex/_generated/dataModel";
 
 export function AuthenticatedHeader() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
   const household = useQuery(api.households.getCurrentHousehold);
   const { signOut } = useAuthActions();
   const navigate = useNavigate();
+  const { activeMemberId, setActiveMemberId } = useActiveMember();
+
+  // Set the first member as active by default if none selected
+  useEffect(() => {
+    if (household?.members && household.members.length > 0) {
+      if (!activeMemberId) {
+        setActiveMemberId(household.members[0].id);
+      }
+      // If the active member was deleted, select the first available member
+      else if (!household.members.find((m) => m.id === activeMemberId)) {
+        setActiveMemberId(household.members[0].id);
+      }
+    }
+  }, [household?.members, activeMemberId, setActiveMemberId]);
 
   // État de chargement
   if (loggedInUser === undefined || household === undefined) {
@@ -32,55 +49,94 @@ export function AuthenticatedHeader() {
 
   const householdName = household?.name || "Balance ta tâche";
   const userName = loggedInUser?.name || loggedInUser?.email || "Utilisateur";
-  const userInitial = userName[0].toUpperCase();
+
+  const activeMember = household?.members?.find((m) => m.id === activeMemberId);
+  const avatarContent = activeMember ? (
+    activeMember.firstName[0].toUpperCase()
+  ) : (
+    <User className="h-5 w-5" />
+  );
+
+  const handleMemberChange = (memberId: Id<"householdMembers">) => {
+    const member = household?.members?.find((m) => m.id === memberId);
+    setActiveMemberId(memberId);
+    if (member) {
+      toast.success(`Profil actif : ${member.firstName}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm h-16 flex justify-between items-center border-b border-slate-200 shadow-sm px-6">
       <h2 className="text-xl font-semibold text-slate-900">{householdName}</h2>
 
-      <div className="flex items-center gap-4">
-        {household && household.members.length > 0 && (
-          <MemberSelector members={household.members} />
-        )}
+      <DropdownMenu>
+        <DropdownMenuTrigger className="focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded-full select-none">
+          <Avatar className="h-10 w-10">
+            <AvatarFallback className="bg-slate-200 text-slate-700 font-medium">
+              {avatarContent}
+            </AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{userName}</p>
+              {loggedInUser?.email && (
+                <p className="text-xs leading-none text-slate-500">
+                  {loggedInUser.email}
+                </p>
+              )}
+            </div>
+          </DropdownMenuLabel>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger className="focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded-full select-none">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="bg-slate-200 text-slate-700 font-medium">
-                {userInitial}
-              </AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userName}</p>
-                {loggedInUser?.email && loggedInUser?.name && (
-                  <p className="text-xs leading-none text-slate-500">
-                    {loggedInUser.email}
-                  </p>
-                )}
+          {household?.members && household.members.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              <div className="px-2 py-1.5">
+                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Profil actif
+                </p>
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => navigate("/family")}
-              className="cursor-pointer"
-            >
-              <Users className="mr-2 h-4 w-4" />
-              <span>Ma famille</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => void signOut()}
-              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Déconnexion</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+              {household.members.map((member) => (
+                <DropdownMenuItem
+                  key={member.id}
+                  onClick={() => handleMemberChange(member.id)}
+                  className="cursor-pointer"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2">
+                      <span>{member.firstName}</span>
+                      <span className="text-xs text-slate-500">
+                        ({member.role === "adult" ? "Adulte" : "Enfant"})
+                      </span>
+                    </div>
+                    {activeMemberId === member.id && (
+                      <Check className="h-4 w-4 text-slate-700" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </>
+          )}
+
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => navigate("/family")}
+            className="cursor-pointer"
+          >
+            <Users className="mr-2 h-4 w-4" />
+            <span>Ma famille</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => void signOut()}
+            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Déconnexion</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }

@@ -19,7 +19,7 @@ export default function App() {
           <Content />
         </div>
       </main>
-      <Toaster position="top-center" />
+      <Toaster position="bottom-center" />
     </div>
   );
 }
