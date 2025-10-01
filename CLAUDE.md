@@ -102,3 +102,5 @@ The app follows a component-based architecture with three main UI states:
 ## Styling
 
 The app uses Tailwind CSS with a custom configuration. Component styling follows the shadcn/ui pattern with `class-variance-authority` for variant management and `tailwind-merge` (via `src/lib/utils.ts`) for className merging.
+
+The app is built for mobile first. For larger screens, the main container has a max width of `md` (768px) and is centered.
