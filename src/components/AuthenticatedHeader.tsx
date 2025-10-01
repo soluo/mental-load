@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useActiveMember } from "@/contexts/MemberContext";
-import { LogOut, Users, Check, User } from "lucide-react";
+import { LogOut as LogOutIcon, Users as UsersIcon, Check as CheckIcon, User as UserIcon } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
@@ -54,7 +54,7 @@ export function AuthenticatedHeader() {
   const avatarContent = activeMember ? (
     activeMember.firstName[0].toUpperCase()
   ) : (
-    <User className="h-5 w-5" />
+    <UserIcon className="h-5 w-5" />
   );
 
   const handleMemberChange = (memberId: Id<"householdMembers">) => {
@@ -111,7 +111,7 @@ export function AuthenticatedHeader() {
                       </span>
                     </div>
                     {activeMemberId === member.id && (
-                      <Check className="h-4 w-4 text-slate-700" />
+                      <CheckIcon className="h-4 w-4 text-slate-700" />
                     )}
                   </div>
                 </DropdownMenuItem>
@@ -124,7 +124,7 @@ export function AuthenticatedHeader() {
             onClick={() => navigate("/family")}
             className="cursor-pointer"
           >
-            <Users className="mr-2 h-4 w-4" />
+            <UsersIcon className="mr-2 h-4 w-4" />
             <span>Ma famille</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -132,7 +132,7 @@ export function AuthenticatedHeader() {
             onClick={() => void signOut()}
             className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOutIcon className="mr-2 h-4 w-4" />
             <span>Déconnexion</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, UserPlus, Mail, Trash2 } from "lucide-react";
+import { Users as UsersIcon, UserPlus as UserPlusIcon, Mail as MailIcon, Trash2 as Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -103,7 +103,7 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
             </p>
           </div>
           <Button onClick={() => setIsDialogOpen(true)}>
-            <UserPlus className="w-4 h-4 mr-2" />
+            <UserPlusIcon className="w-4 h-4 mr-2" />
             Ajouter un membre
           </Button>
         </div>
@@ -111,7 +111,7 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div className="flex items-center gap-3 mb-6">
-          <Users className="w-5 h-5 text-slate-600" />
+          <UsersIcon className="w-5 h-5 text-slate-600" />
           <h2 className="text-xl font-medium text-slate-900">
             Membres du foyer
           </h2>
@@ -148,7 +148,7 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
                 </div>
                 {member.email && (
                   <div className="flex items-center gap-1 text-sm text-slate-600 mt-1">
-                    <Mail className="w-3 h-3" />
+                    <MailIcon className="w-3 h-3" />
                     <span className="truncate">{member.email}</span>
                   </div>
                 )}
@@ -159,14 +159,14 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
                 onClick={() => handleRemoveMember(member.id)}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2Icon className="w-4 h-4" />
               </Button>
             </div>
           ))}
 
           {household.members.length === 0 && (
             <div className="text-center py-12 text-slate-500">
-              <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <UsersIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
               <p>Aucun membre dans ce foyer</p>
             </div>
           )}

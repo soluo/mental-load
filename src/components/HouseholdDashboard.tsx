@@ -1,4 +1,4 @@
-import { Home } from "lucide-react";
+import { Home as HomeIcon } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
 
 interface Member {
@@ -26,7 +26,7 @@ export function HouseholdDashboard({ household }: HouseholdDashboardProps) {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div className="text-center py-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-            <Home className="w-8 h-8 text-slate-400" />
+            <HomeIcon className="w-8 h-8 text-slate-400" />
           </div>
           <h3 className="text-lg font-medium text-slate-900 mb-2">
             Votre espace est prêt

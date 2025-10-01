@@ -99,6 +99,10 @@ The app follows a component-based architecture with three main UI states:
 - `sonner`: Toast notifications
 - `lucide-react`: Icon library
 
+## Conventions
+
+- When importing icons from lucide-react, import the icon with Icon suffix (e.g. `import { UserIcon } from "lucide-react"`).
+
 ## Styling
 
 The app uses Tailwind CSS with a custom configuration. Component styling follows the shadcn/ui pattern with `class-variance-authority` for variant management and `tailwind-merge` (via `src/lib/utils.ts`) for className merging.
