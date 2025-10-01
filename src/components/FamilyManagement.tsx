@@ -1,0 +1,244 @@
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Users, UserPlus, Mail, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { Id } from "../../convex/_generated/dataModel";
+
+interface Member {
+  id: Id<"householdMembers">;
+  userId?: Id<"users">;
+  firstName: string;
+  role: "adult" | "child";
+  email?: string;
+  joinedAt: number;
+}
+
+interface Household {
+  id: Id<"households">;
+  name: string;
+  members: Member[];
+}
+
+interface FamilyManagementProps {
+  household: Household;
+}
+
+export function FamilyManagement({ household }: FamilyManagementProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [role, setRole] = useState<"adult" | "child">("adult");
+  const [email, setEmail] = useState("");
+
+  const addMember = useMutation(api.members.addMember);
+  const removeMember = useMutation(api.members.removeMember);
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!firstName.trim()) {
+      toast.error("Le prénom est obligatoire");
+      return;
+    }
+
+    try {
+      await addMember({
+        householdId: household.id,
+        firstName: firstName.trim(),
+        role,
+        email: email.trim() || undefined,
+      });
+
+      toast.success("Membre ajouté avec succès");
+      setIsDialogOpen(false);
+      setFirstName("");
+      setRole("adult");
+      setEmail("");
+    } catch (error) {
+      toast.error("Erreur lors de l'ajout du membre");
+      console.error(error);
+    }
+  };
+
+  const handleRemoveMember = async (memberId: Id<"householdMembers">) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce membre ?")) return;
+
+    try {
+      await removeMember({ memberId });
+      toast.success("Membre supprimé");
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la suppression");
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Ma famille
+            </h1>
+            <p className="text-slate-600">
+              Gérez les membres de votre foyer
+            </p>
+          </div>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <UserPlus className="w-4 h-4 mr-2" />
+            Ajouter un membre
+          </Button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <Users className="w-5 h-5 text-slate-600" />
+          <h2 className="text-xl font-medium text-slate-900">
+            Membres du foyer
+          </h2>
+          <span className="text-sm text-slate-500">
+            ({household.members.length})
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {household.members.map((member) => (
+            <div
+              key={member.id}
+              className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
+            >
+              <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                <span className="text-slate-700 font-medium text-lg">
+                  {member.firstName[0].toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-slate-900">
+                    {member.firstName}
+                  </p>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      member.role === "adult"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-green-100 text-green-700"
+                    }`}
+                  >
+                    {member.role === "adult" ? "Adulte" : "Enfant"}
+                  </span>
+                </div>
+                {member.email && (
+                  <div className="flex items-center gap-1 text-sm text-slate-600 mt-1">
+                    <Mail className="w-3 h-3" />
+                    <span className="truncate">{member.email}</span>
+                  </div>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRemoveMember(member.id)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+
+          {household.members.length === 0 && (
+            <div className="text-center py-12 text-slate-500">
+              <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>Aucun membre dans ce foyer</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ajouter un membre</DialogTitle>
+            <DialogDescription>
+              Ajoutez un nouveau membre à votre foyer. Si vous renseignez un email,
+              une invitation lui sera envoyée.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleAddMember}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">
+                  Prénom <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Ex: Marie"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="role">Rôle</Label>
+                <Select value={role} onValueChange={(value) => setRole(value as "adult" | "child")}>
+                  <SelectTrigger id="role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="adult">Adulte</SelectItem>
+                    <SelectItem value="child">Enfant</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email (facultatif)</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="membre@example.com"
+                />
+                <p className="text-xs text-slate-500">
+                  Un email permettra à ce membre de se connecter à l'application
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Annuler
+              </Button>
+              <Button type="submit">Ajouter</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

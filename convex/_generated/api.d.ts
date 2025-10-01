@@ -16,7 +16,10 @@ import type {
 import type * as auth from "../auth.js";
 import type * as households from "../households.js";
 import type * as http from "../http.js";
+import type * as members from "../members.js";
+import type * as migrations_migrateMembersSchema from "../migrations/migrateMembersSchema.js";
 import type * as router from "../router.js";
+import type * as runMigration from "../runMigration.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -30,7 +33,10 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   households: typeof households;
   http: typeof http;
+  members: typeof members;
+  "migrations/migrateMembersSchema": typeof migrations_migrateMembersSchema;
   router: typeof router;
+  runMigration: typeof runMigration;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

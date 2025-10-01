@@ -1,8 +1,10 @@
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+import { Routes, Route } from "react-router-dom";
 import { api } from "../convex/_generated/api";
 import { AuthenticatedHeader } from "@/components/AuthenticatedHeader";
 import { HouseholdSetup } from "@/components/HouseholdSetup";
 import { HouseholdDashboard } from "@/components/HouseholdDashboard";
+import { FamilyManagement } from "@/components/FamilyManagement";
 import { AuthForm } from "@/components/AuthForm";
 import { Toaster } from "sonner";
 
@@ -38,7 +40,10 @@ function Content() {
     <>
       <Authenticated>
         {household ? (
-          <HouseholdDashboard household={household} />
+          <Routes>
+            <Route path="/" element={<HouseholdDashboard household={household} />} />
+            <Route path="/family" element={<FamilyManagement household={household} />} />
+          </Routes>
         ) : (
           <HouseholdSetup />
         )}

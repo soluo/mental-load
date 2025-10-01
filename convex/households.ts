@@ -5,6 +5,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 export const createHousehold = mutation({
   args: {
     name: v.string(),
+    firstName: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -17,9 +18,12 @@ export const createHousehold = mutation({
       createdBy: userId,
     });
 
+    // Create first member for the user
     await ctx.db.insert("householdMembers", {
       householdId,
       userId,
+      firstName: args.firstName,
+      role: "adult",
       joinedAt: Date.now(),
     });
 
@@ -45,12 +49,6 @@ export const joinHousehold = mutation({
     if (existing) {
       throw new Error("Already member of a household");
     }
-
-    await ctx.db.insert("householdMembers", {
-      householdId: args.householdId,
-      userId,
-      joinedAt: Date.now(),
-    });
 
     return args.householdId;
   },
@@ -83,17 +81,16 @@ export const getCurrentHousehold = query({
       .withIndex("by_household", (q) => q.eq("householdId", household._id))
       .collect();
 
-    const memberDetails = await Promise.all(
-      members.map(async (member) => {
-        const user = await ctx.db.get(member.userId);
-        return {
-          id: member.userId,
-          email: user?.email,
-          name: user?.name,
-          joinedAt: member.joinedAt,
-        };
-      })
-    );
+    const memberDetails = members
+      .filter((member) => member.firstName && member.role) // Filter out old members without firstName/role
+      .map((member) => ({
+        id: member._id,
+        userId: member.userId,
+        firstName: member.firstName!,
+        role: member.role!,
+        email: member.email,
+        joinedAt: member.joinedAt,
+      }));
 
     return {
       id: household._id,

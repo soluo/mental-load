@@ -11,7 +11,6 @@ export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
   });
@@ -22,9 +21,6 @@ export function AuthForm() {
 
     try {
       const formDataToSend = new FormData();
-      if (isSignUp && formData.name) {
-        formDataToSend.append("name", formData.name);
-      }
       formDataToSend.append("email", formData.email);
       formDataToSend.append("password", formData.password);
       formDataToSend.append("flow", isSignUp ? "signUp" : "signIn");
@@ -58,23 +54,6 @@ export function AuthForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {isSignUp && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Votre nom"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required={isSignUp}
-                disabled={isLoading}
-              />
-            </div>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input

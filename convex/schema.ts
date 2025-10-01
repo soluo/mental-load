@@ -9,7 +9,10 @@ const applicationTables = {
   }),
   householdMembers: defineTable({
     householdId: v.id("households"),
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
+    firstName: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("adult"), v.literal("child"))),
+    email: v.optional(v.string()),
     joinedAt: v.number(),
   })
     .index("by_household", ["householdId"])

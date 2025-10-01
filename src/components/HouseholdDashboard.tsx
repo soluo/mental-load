@@ -3,16 +3,19 @@ import { api } from "../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Home, Users, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { Id } from "../../convex/_generated/dataModel";
 
 interface Member {
-  id: string;
+  id: Id<"householdMembers">;
+  userId?: Id<"users">;
+  firstName: string;
+  role: "adult" | "child";
   email?: string;
-  name?: string;
   joinedAt: number;
 }
 
 interface Household {
-  id: string;
+  id: Id<"households">;
   name: string;
   members: Member[];
 }
@@ -74,14 +77,25 @@ export function HouseholdDashboard({ household }: HouseholdDashboardProps) {
               >
                 <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
                   <span className="text-slate-600 font-medium text-sm">
-                    {(member.name || member.email || "?")[0].toUpperCase()}
+                    {member.firstName[0].toUpperCase()}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900">
-                    {member.name || member.email || "Utilisateur"}
-                  </p>
-                  {member.email && member.name && (
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-slate-900">
+                      {member.firstName}
+                    </p>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        member.role === "adult"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {member.role === "adult" ? "Adulte" : "Enfant"}
+                    </span>
+                  </div>
+                  {member.email && (
                     <p className="text-sm text-slate-600">{member.email}</p>
                   )}
                 </div>
