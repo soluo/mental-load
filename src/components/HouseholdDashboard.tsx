@@ -1,6 +1,6 @@
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { Home, Users, LogOut } from "lucide-react";
 import { toast } from "sonner";
 

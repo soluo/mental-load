@@ -1,9 +1,9 @@
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { SignOutButton } from "./SignOutButton";
-import { HouseholdSetup } from "./components/HouseholdSetup";
-import { HouseholdDashboard } from "./components/HouseholdDashboard";
-import { AuthForm } from "./components/AuthForm";
+import { SignOutButton } from "@/SignOutButton";
+import { HouseholdSetup } from "@/components/HouseholdSetup";
+import { HouseholdDashboard } from "@/components/HouseholdDashboard";
+import { AuthForm } from "@/components/AuthForm";
 import { Toaster } from "sonner";
 
 export default function App() {
