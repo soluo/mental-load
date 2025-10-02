@@ -91,9 +91,15 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
     householdId: household.id,
   });
 
-  const tasksForPicker = useQuery(api.tasks.getTasksForPicker, {
-    householdId: household.id,
-  });
+  const tasksForPicker = useQuery(
+    api.tasks.getTasksForPicker,
+    activeMemberId
+      ? {
+          householdId: household.id,
+          memberId: activeMemberId,
+        }
+      : "skip"
+  );
 
   if (recentCompletions === undefined || tasksForPicker === undefined) {
     return (

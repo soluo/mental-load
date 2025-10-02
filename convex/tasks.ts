@@ -505,6 +505,7 @@ export const assignTask = mutation({
 export const getTasksForPicker = query({
   args: {
     householdId: v.id("households"),
+    memberId: v.id("householdMembers"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -512,14 +513,20 @@ export const getTasksForPicker = query({
       throw new Error("Not authenticated");
     }
 
-    // Verify user belongs to household
-    const membership = await ctx.db
+    // Verify the member belongs to the household
+    const member = await ctx.db.get(args.memberId);
+    if (!member || member.householdId !== args.householdId) {
+      throw new Error("Member does not belong to this household");
+    }
+
+    // Verify user has access to this household
+    const userMembership = await ctx.db
       .query("householdMembers")
       .withIndex("by_household", (q) => q.eq("householdId", args.householdId))
       .filter((q) => q.eq(q.field("userId"), userId))
       .first();
 
-    if (!membership) {
+    if (!userMembership) {
       throw new Error("User is not a member of this household");
     }
 
@@ -531,7 +538,7 @@ export const getTasksForPicker = query({
       )
       .collect();
 
-    // Get today's completions
+    // Get today's completions for the active member
     const startOfDay = getStartOfDay();
     const todayCompletions = await ctx.db
       .query("taskCompletions")
@@ -540,14 +547,19 @@ export const getTasksForPicker = query({
       )
       .collect();
 
-    const todayCompletedTaskIds = new Set(
-      todayCompletions.map((c) => c.taskId)
+    // Filter today's completions to only those by the active member
+    const todayMemberCompletions = todayCompletions.filter(
+      (c) => c.completedBy === args.memberId
     );
 
-    // Get all completions for frequency analysis
+    const todayCompletedTaskIds = new Set(
+      todayMemberCompletions.map((c) => c.taskId)
+    );
+
+    // Get all completions for frequency analysis (for the active member)
     const allCompletions = await ctx.db
       .query("taskCompletions")
-      .withIndex("by_member", (q) => q.eq("completedBy", membership._id))
+      .withIndex("by_member", (q) => q.eq("completedBy", args.memberId))
       .collect();
 
     // Count completions per task by current member
