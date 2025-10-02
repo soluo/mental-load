@@ -2,6 +2,7 @@ import {XIcon, CircleIcon} from 'lucide-react';
 import {Dialog, DialogPortal} from "@/components/ui/dialog";
 import {Doc} from "../../convex/_generated/dataModel";
 import {useEffect} from "react";
+import {pushModal, popModal} from "@/lib/modalStack";
 
 interface TaskPickerModalProps {
   open: boolean;
@@ -115,12 +116,12 @@ export function TaskPickerModal({
   // Block body scroll when modal is open
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      pushModal();
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      if (open) {
+        popModal();
+      }
     };
   }, [open]);
 

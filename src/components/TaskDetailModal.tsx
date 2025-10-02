@@ -7,6 +7,7 @@ import {api} from "../../convex/_generated/api";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
+import {pushModal, popModal} from "@/lib/modalStack";
 
 interface TaskDetailModalProps {
   open: boolean;
@@ -16,6 +17,8 @@ interface TaskDetailModalProps {
   onTaskCompleted?: () => void;
 }
 
+type DurationOption = '5' | '15' | '30' | '60' | 'custom';
+
 export function TaskDetailModal({
   open,
   onOpenChange,
@@ -23,7 +26,8 @@ export function TaskDetailModal({
   activeMemberId,
   onTaskCompleted,
 }: TaskDetailModalProps) {
-  const [duration, setDuration] = useState<string>('');
+  const [selectedDuration, setSelectedDuration] = useState<DurationOption | null>(null);
+  const [customDuration, setCustomDuration] = useState<string>('');
   const [showNotes, setShowNotes] = useState(false);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +38,8 @@ export function TaskDetailModal({
   // Reset form when modal opens/closes or task changes
   useEffect(() => {
     if (open && task) {
-      setDuration('');
+      setSelectedDuration(null);
+      setCustomDuration('');
       setNotes('');
       setShowNotes(false);
       setIsSubmitting(false);
@@ -44,12 +49,12 @@ export function TaskDetailModal({
   // Block body scroll when modal is open
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      pushModal();
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      if (open) {
+        popModal();
+      }
     };
   }, [open]);
 
@@ -87,12 +92,26 @@ export function TaskDetailModal({
   const handleCompleteTask = async () => {
     if (!task || !activeMemberId) return;
 
+    // Validate custom duration if selected
+    if (selectedDuration === 'custom' && !customDuration) {
+      alert('Veuillez saisir une durée');
+      return;
+    }
+
+    // Get the duration value in minutes
+    let durationInMinutes: number | undefined;
+    if (selectedDuration && selectedDuration !== 'custom') {
+      durationInMinutes = parseInt(selectedDuration, 10);
+    } else if (selectedDuration === 'custom' && customDuration) {
+      durationInMinutes = parseInt(customDuration, 10);
+    }
+
     setIsSubmitting(true);
     try {
       await completeTask({
         taskId: task._id,
         completedBy: activeMemberId,
-        duration: duration ? parseInt(duration, 10) : undefined,
+        duration: durationInMinutes,
         notes: notes || undefined,
       });
       if (onTaskCompleted) {
@@ -169,30 +188,93 @@ export function TaskDetailModal({
               )}
 
               {/* Completion form */}
-              <div className="space-y-6">
+              <div className="-mx-4 p-4 pb-6 bg-gray-50 rounded-lg space-y-6">
                 <h3 className="text-lg font-semibold text-slate-900">
-                  Marquer comme terminée
+                  Vous l'avez fait ?
                 </h3>
 
-                {/* Duration input */}
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Temps passé (optionnel)</Label>
-                  <div className="flex gap-2 items-center">
-                    <Input
-                      id="duration"
-                      type="number"
-                      min="1"
-                      placeholder="15"
-                      value={duration}
-                      onChange={(e) => setDuration(e.target.value)}
-                      className="flex-1"
-                    />
-                    <span className="text-sm text-slate-500">minutes</span>
+                {/* Duration selection */}
+                <div>
+                  <Label className="block mb-3">Temps passé</Label>
+
+                  {/* Quick duration buttons */}
+                  <div className="grid grid-cols-5 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDuration('5')}
+                      className={`px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                        selectedDuration === '5'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      5mn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDuration('15')}
+                      className={`px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                        selectedDuration === '15'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      15mn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDuration('30')}
+                      className={`px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                        selectedDuration === '30'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      30mn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDuration('60')}
+                      className={`px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                        selectedDuration === '60'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      1h
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedDuration('custom')}
+                      className={`px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                        selectedDuration === 'custom'
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      Autre
+                    </button>
                   </div>
+
+                  {/* Custom duration input - shown only when "Autre" is selected */}
+                  {selectedDuration === 'custom' && (
+                    <div className="flex gap-2 items-center justify-center pt-2">
+                      <Input
+                        id="custom-duration"
+                        type="number"
+                        min="1"
+                        value={customDuration}
+                        onChange={(e) => setCustomDuration(e.target.value)}
+                        className="w-20 bg-white text-base h-11"
+                        autoFocus
+                      />
+                      <span className="text-base text-slate-500 font-medium">minutes</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Notes toggle/input */}
-                <div className="space-y-2">
+                <div>
                   {!showNotes ? (
                     <button
                       onClick={() => setShowNotes(true)}
@@ -202,7 +284,7 @@ export function TaskDetailModal({
                     </button>
                   ) : (
                     <>
-                      <Label htmlFor="notes">Note</Label>
+                      <Label htmlFor="notes" className="block mb-3">Note</Label>
                       <textarea
                         id="notes"
                         value={notes}
@@ -221,8 +303,8 @@ export function TaskDetailModal({
                   className="w-full"
                   size="lg"
                 >
-                  <CheckIcon className="h-5 w-5 mr-2" />
-                  Terminer
+                  <CheckIcon className="h-5 w-5" />
+                  <span>C'est fait</span>
                 </Button>
               </div>
             </div>
