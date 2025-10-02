@@ -17,7 +17,7 @@ export function HouseholdSetup() {
   // Auto-fill household name based on first name
   useEffect(() => {
     if (firstName.trim()) {
-      setHouseholdName(`Foyer de ${firstName.trim()}`);
+      setHouseholdName(`Chez ${firstName.trim()}`);
     } else {
       setHouseholdName("");
     }
@@ -43,7 +43,7 @@ export function HouseholdSetup() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-xl mx-auto">
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-6">
           <HomeIcon className="w-8 h-8 text-slate-600" />
@@ -68,7 +68,7 @@ export function HouseholdSetup() {
                 Créer un nouveau foyer
               </h3>
               <p className="text-sm text-slate-600">
-                Commencez votre espace et invitez votre partenaire
+                Vous pourrez ensuite inviter un autre membre à vous rejoindre
               </p>
             </div>
           </div>
@@ -90,7 +90,7 @@ export function HouseholdSetup() {
               <Label htmlFor="household-name">Nom du foyer</Label>
               <Input
                 id="household-name"
-                placeholder="Foyer de..."
+                placeholder="Chez ..."
                 value={householdName}
                 onChange={(e) => setHouseholdName(e.target.value)}
                 required

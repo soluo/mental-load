@@ -123,7 +123,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-8">
+    <div className="w-full max-w-2xl mx-auto">
       {/* Action section with "Faire quelque chose" button */}
       <div className="flex items-center justify-center min-h-[300px] mb-8">
         <button
@@ -134,7 +134,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
         </button>
       </div>
 
-      <h2 className="pl-2 text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
+      <h2 className="text-center text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
 
       {recentCompletions.length === 0 ? (
         <div className="text-center py-12">
