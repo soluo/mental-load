@@ -443,3 +443,111 @@ export const deleteTask = mutation({
     return { success: true };
   },
 });
+
+/**
+ * Get tasks for picker modal
+ * Returns three categories: À faire, Vous faites souvent, Vous pourriez faire
+ */
+export const getTasksForPicker = query({
+  args: {
+    householdId: v.id("households"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Verify user belongs to household
+    const membership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", args.householdId))
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .first();
+
+    if (!membership) {
+      throw new Error("User is not a member of this household");
+    }
+
+    // Get all active tasks
+    const allTasks = await ctx.db
+      .query("tasks")
+      .withIndex("by_household_active", (q) =>
+        q.eq("householdId", args.householdId).eq("isActive", true)
+      )
+      .collect();
+
+    // Get today's completions
+    const startOfDay = getStartOfDay();
+    const todayCompletions = await ctx.db
+      .query("taskCompletions")
+      .withIndex("by_household_date", (q) =>
+        q.eq("householdId", args.householdId).gte("completedAt", startOfDay)
+      )
+      .collect();
+
+    const todayCompletedTaskIds = new Set(
+      todayCompletions.map((c) => c.taskId)
+    );
+
+    // Get all completions for frequency analysis
+    const allCompletions = await ctx.db
+      .query("taskCompletions")
+      .withIndex("by_member", (q) => q.eq("completedBy", membership._id))
+      .collect();
+
+    // Count completions per task by current member
+    const completionCountByTask = new Map<string, number>();
+    for (const completion of allCompletions) {
+      const count = completionCountByTask.get(completion.taskId) || 0;
+      completionCountByTask.set(completion.taskId, count + 1);
+    }
+
+    // Categorize tasks
+    const aFaire = [];
+    const vousFaitesSouvent = [];
+    const vousPourriezFaire = [];
+
+    for (const task of allTasks) {
+      const isCompletedToday = todayCompletedTaskIds.has(task._id);
+      const isVisible = isTaskVisibleToday(task, isCompletedToday);
+
+      if (!isVisible) continue;
+
+      if (task.type === "one-time" && task.scheduling?.dueDate) {
+        // À faire: one-time tasks with due date
+        aFaire.push(task);
+      } else if (task.type === "flexible") {
+        const completionCount = completionCountByTask.get(task._id) || 0;
+        if (completionCount >= 3) {
+          // Vous faites souvent: flexible tasks completed 3+ times by member
+          vousFaitesSouvent.push(task);
+        } else {
+          // Vous pourriez faire: flexible tasks completed <3 times
+          vousPourriezFaire.push(task);
+        }
+      }
+    }
+
+    // Sort À faire by due date
+    aFaire.sort((a, b) => {
+      const dateA = a.scheduling?.dueDate || 0;
+      const dateB = b.scheduling?.dueDate || 0;
+      return dateA - dateB;
+    });
+
+    // Sort Vous faites souvent by completion count (descending)
+    vousFaitesSouvent.sort((a, b) => {
+      const countA = completionCountByTask.get(a._id) || 0;
+      const countB = completionCountByTask.get(b._id) || 0;
+      return countB - countA;
+    });
+
+    return {
+      aFaire,
+      vousFaitesSouvent,
+      vousPourriezFaire,
+      completionCounts: Object.fromEntries(completionCountByTask),
+    };
+  },
+});

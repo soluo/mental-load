@@ -2,7 +2,9 @@ import {useQuery} from "convex/react";
 import {api} from "../../convex/_generated/api";
 import {Id} from "../../convex/_generated/dataModel";
 import {formatCompletionDate} from "@/lib/utils";
-import {CheckIcon} from 'lucide-react'
+import {CheckIcon} from 'lucide-react';
+import {TaskPickerModal} from "@/components/TaskPickerModal";
+import {useState} from "react";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -78,11 +80,17 @@ function getDynamicTitle(recentCompletions: any[]): string {
 }
 
 export function HouseholdDashboard({household}: HouseholdDashboardProps) {
+  const [isTaskPickerOpen, setIsTaskPickerOpen] = useState(false);
+
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
 
-  if (recentCompletions === undefined) {
+  const tasksForPicker = useQuery(api.tasks.getTasksForPicker, {
+    householdId: household.id,
+  });
+
+  if (recentCompletions === undefined || tasksForPicker === undefined) {
     return (
       <div className="w-full max-w-2xl mx-auto py-8">
         <div className="text-center">
@@ -96,6 +104,16 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto py-8">
+      {/* Action section with "Faire quelque chose" button */}
+      <div className="flex items-center justify-center min-h-[300px] mb-8">
+        <button
+          onClick={() => setIsTaskPickerOpen(true)}
+          className="px-8 py-4 text-xl font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-md"
+        >
+          Faire quelque chose
+        </button>
+      </div>
+
       <h2 className="pl-2 text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
 
       {recentCompletions.length === 0 ? (
@@ -115,6 +133,16 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
           ))}
         </div>
       )}
+
+      {/* Task Picker Modal */}
+      <TaskPickerModal
+        open={isTaskPickerOpen}
+        onOpenChange={setIsTaskPickerOpen}
+        aFaire={tasksForPicker.aFaire}
+        vousFaitesSouvent={tasksForPicker.vousFaitesSouvent}
+        vousPourriezFaire={tasksForPicker.vousPourriezFaire}
+        completionCounts={new Map(Object.entries(tasksForPicker.completionCounts))}
+      />
     </div>
   );
 }
