@@ -31,7 +31,7 @@ function TaskItem({task, onClick, subtitle, estimatedDuration}: TaskItemProps) {
         <CircleIcon className="h-5 w-5 text-slate-400"/>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-base/6 font-medium text-slate-900 truncate">{task.title}</div>
+        <div className="text-sm/6 font-medium text-slate-900 truncate">{task.title}</div>
         <div className="text-sm text-slate-500">
           {subtitle}
         </div>

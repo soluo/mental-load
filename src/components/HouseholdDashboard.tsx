@@ -46,7 +46,7 @@ function TaskCompletionItem({
         <CheckIcon className="h-5 w-5 text-lime-500"/>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-base/6 font-medium text-slate-900">{taskTitle}</div>
+        <div className="text-sm/6 font-medium text-slate-900 truncate">{taskTitle}</div>
         <div className="flex items-baseline gap-1.5 text-sm text-slate-500">
           <span>{memberName}</span>
           <span>•</span>
