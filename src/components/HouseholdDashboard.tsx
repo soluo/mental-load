@@ -1,7 +1,8 @@
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
-import { formatCompletionDate } from "@/lib/utils";
+import {useQuery} from "convex/react";
+import {api} from "../../convex/_generated/api";
+import {Id} from "../../convex/_generated/dataModel";
+import {formatCompletionDate} from "@/lib/utils";
+import {CheckIcon} from 'lucide-react'
 
 interface Member {
   id: Id<"householdMembers">;
@@ -22,66 +23,98 @@ interface HouseholdDashboardProps {
   household: Household;
 }
 
-export function HouseholdDashboard({ household }: HouseholdDashboardProps) {
+interface TaskCompletionItemProps {
+  taskTitle: string;
+  completedAt: number;
+  memberName: string;
+  duration?: number;
+}
+
+function TaskCompletionItem({
+  taskTitle,
+  completedAt,
+  memberName,
+  duration,
+}: TaskCompletionItemProps) {
+  return (
+    <div className="bg-gray-100/25 flex gap-2 p-1.5 border border-gray-300 rounded-full">
+      <div className="shrink-0 flex items-center justify-center size-12 bg-gray-500/10 rounded-full">
+        <CheckIcon className="h-5 w-5 text-lime-500"/>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-base/6 font-medium text-slate-900">{taskTitle}</div>
+        <div className="flex items-baseline gap-1.5 text-sm text-slate-500">
+          <span>{memberName}</span>
+          <span>•</span>
+          <span className="text-sm text-slate-500">
+            {formatCompletionDate(completedAt)}
+          </span>
+        </div>
+      </div>
+      <div className="shrink-0 flex items-center justify-center size-12 xbg-gray-300/10 rounded-full">
+        {duration && <span className="text-xs text-slate-500">{duration} mn</span>}
+      </div>
+    </div>
+  );
+}
+
+function getDynamicTitle(recentCompletions: any[]): string {
+  if (recentCompletions.length === 0) {
+    return "Il ne s'est encore rien passé";
+  }
+
+  const lastCompletion = recentCompletions[0];
+  const daysSinceLastCompletion = Math.floor(
+    (Date.now() - lastCompletion.completedAt) / (1000 * 60 * 60 * 24)
+  );
+
+  if (daysSinceLastCompletion > 7) {
+    return "C'est trop calme ici !";
+  } else if (daysSinceLastCompletion > 2) {
+    return "Vous n'avez rien oublié ?";
+  } else {
+    return "Ça bosse dur 👍";
+  }
+}
+
+export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
 
   if (recentCompletions === undefined) {
     return (
-      <div className="w-full max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800 mx-auto"></div>
-          </div>
+      <div className="w-full max-w-2xl mx-auto py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800 mx-auto"></div>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-        <h2 className="text-xl font-semibold text-slate-900 mb-6">
-          Dernières tâches réalisées
-        </h2>
+  const title = getDynamicTitle(recentCompletions);
 
-        {recentCompletions.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-600">
-              Il ne s'est encore rien passé
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {recentCompletions.map((completion) => (
-              <div
-                key={completion._id}
-                className="flex items-start justify-between py-3 border-b border-slate-100 last:border-b-0"
-              >
-                <div className="flex-1">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-medium text-slate-900">
-                      {completion.task?.title || "Tâche supprimée"}
-                    </span>
-                    <span className="text-sm text-slate-500">
-                      {formatCompletionDate(completion.completedAt)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-slate-600">
-                    <span>
-                      par : {completion.member?.firstName || "Membre inconnu"}
-                    </span>
-                    {completion.duration && (
-                      <span>durée : {completion.duration} minutes</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+  return (
+    <div className="w-full max-w-2xl mx-auto py-8">
+      <h2 className="pl-2 text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
+
+      {recentCompletions.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-slate-600">Commencez par créer des tâches</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {recentCompletions.map((completion) => (
+            <TaskCompletionItem
+              key={completion._id}
+              taskTitle={completion.task?.title || "Tâche supprimée"}
+              completedAt={completion.completedAt}
+              memberName={completion.member?.firstName || "Membre inconnu"}
+              duration={completion.duration}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

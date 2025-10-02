@@ -10,11 +10,11 @@ import { Toaster } from "sonner";
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <Authenticated>
         <AuthenticatedHeader />
       </Authenticated>
-      <main className="flex-1 flex justify-center p-5">
+      <main className="flex-1 flex justify-center p-4">
         <Content />
       </main>
       <Toaster position="bottom-center" />
