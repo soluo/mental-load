@@ -65,8 +65,52 @@ export const seedTasks = mutation({
     // Define flexible tasks
     const flexibleTasks = [
       {
+        title: "Faire le repas",
+        description: "Préparer le déjeuner ou le dîner",
+      },
+      {
+        title: "Réchauffer le repas",
+        description: "Réchauffer le repas préparé",
+      },
+      {
+        title: "Lancer le lave-vaisselle",
+        description: "Ranger la vaisselle propre dans les placards",
+      },
+      {
         title: "Vider le lave-vaisselle",
         description: "Ranger la vaisselle propre dans les placards",
+      },
+      {
+        title: "Faire les devoirs d'un enfant",
+        description: "Aider un enfant avec ses devoirs",
+      },
+      {
+        title: "Faire les devoirs des enfants",
+        description: "Aider les enfants avec leurs devoirs",
+      },
+      {
+        title: "Prendre un rendez-vous médical pour un enfant",
+        description: "Appeler pour prendre un rendez-vous médical",
+      },
+      {
+        title: "Accompagner un enfant à un rdv médical",
+        description: "Accompagner un enfant à son rendez-vous médical",
+      },
+      {
+        title: "Emmener les enfants à l'école",
+        description: "Conduire les enfants à l'école le matin",
+      },
+      {
+        title: "Récupérer les enfants à l'école",
+        description: "Aller chercher les enfants à l'école le soir",
+      },
+      {
+        title: "Donner le goûter aux enfants",
+        description: "Préparer et donner le goûter aux enfants",
+      },
+      {
+        title: "Emmener les enfants à une activité extra-scolaire",
+        description: "Conduire les enfants à leur activité",
       },
       {
         title: "Passer l'aspirateur",
@@ -81,11 +125,15 @@ export const seedTasks = mutation({
         description: "Nettoyer lavabo, douche et toilettes",
       },
       {
-        title: "Faire les courses",
+        title: "Faire les grosses courses",
         description: "Acheter les produits de la liste de courses",
       },
       {
-        title: "Laver les vitres",
+        title: "Faire des courses d'appoint",
+        description: "Acheter ce qu'il manque pour la semaine",
+      },
+      {
+        title: "Faire les vitres",
         description: "Nettoyer les vitres du salon",
       },
       {
@@ -93,20 +141,40 @@ export const seedTasks = mutation({
         description: "Arroser toutes les plantes d'intérieur",
       },
       {
+        title: "Aller chercher le courrier",
+        description: "Récupérer le courrier dans la boîte aux lettres",
+      },
+      {
+        title: "Aller chercher un colis",
+        description: "Récupérer un colis au point relais ou à la poste",
+      },
+      {
         title: "Ranger le salon",
         description: "Remettre de l'ordre dans le salon",
+      },
+      {
+        title: "Ranger la chambre des enfants",
+        description: "Remettre de l'ordre dans la chambre des enfants",
+      },
+      {
+        title: "Ranger les jouets/jeux des enfants",
+        description: "Remettre les jouets/jeux des enfants à leur place",
       },
       {
         title: "Nettoyer la cuisine",
         description: "Nettoyer les surfaces et le plan de travail",
       },
       {
-        title: "Faire la lessive",
+        title: "Lancer la machine",
         description: "Lancer une machine de linge",
       },
       {
         title: "Étendre le linge",
         description: "Étendre le linge propre",
+      },
+      {
+        title: "Ranger le linge",
+        description: "Plier et ranger le linge propre",
       },
       {
         title: "Repasser",
