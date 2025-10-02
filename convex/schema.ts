@@ -33,10 +33,12 @@ const applicationTables = {
     completedAt: v.optional(v.number()),
     createdAt: v.number(),
     createdBy: v.id("householdMembers"),
+    assignedTo: v.optional(v.id("householdMembers")),
   })
     .index("by_household", ["householdId"])
     .index("by_household_active", ["householdId", "isActive"])
-    .index("by_household_type", ["householdId", "type"]),
+    .index("by_household_type", ["householdId", "type"])
+    .index("by_household_assigned", ["householdId", "assignedTo"]),
   taskCompletions: defineTable({
     taskId: v.id("tasks"),
     householdId: v.id("households"),

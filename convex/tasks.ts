@@ -231,6 +231,7 @@ export const createTask = mutation({
 export const completeTask = mutation({
   args: {
     taskId: v.id("tasks"),
+    completedBy: v.id("householdMembers"),
     notes: v.optional(v.string()),
     duration: v.optional(v.number()),
   },
@@ -245,14 +246,20 @@ export const completeTask = mutation({
       throw new Error("Task not found");
     }
 
-    // Verify user belongs to household
-    const membership = await ctx.db
+    // Verify the member belongs to the task's household
+    const member = await ctx.db.get(args.completedBy);
+    if (!member || member.householdId !== task.householdId) {
+      throw new Error("Member does not belong to this household");
+    }
+
+    // Verify user has access to this household
+    const userMembership = await ctx.db
       .query("householdMembers")
       .withIndex("by_household", (q) => q.eq("householdId", task.householdId))
       .filter((q) => q.eq(q.field("userId"), userId))
       .first();
 
-    if (!membership) {
+    if (!userMembership) {
       throw new Error("User is not a member of this household");
     }
 
@@ -266,7 +273,7 @@ export const completeTask = mutation({
     await ctx.db.insert("taskCompletions", {
       taskId: args.taskId,
       householdId: task.householdId,
-      completedBy: membership._id,
+      completedBy: args.completedBy,
       completedAt,
       forDate,
       duration: args.duration,
@@ -445,6 +452,53 @@ export const deleteTask = mutation({
 });
 
 /**
+ * Assign a one-time task to a member
+ */
+export const assignTask = mutation({
+  args: {
+    taskId: v.id("tasks"),
+    assignedTo: v.id("householdMembers"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const task = await ctx.db.get(args.taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+
+    if (task.type !== "one-time") {
+      throw new Error("Only one-time tasks can be assigned");
+    }
+
+    // Verify the member belongs to the task's household
+    const member = await ctx.db.get(args.assignedTo);
+    if (!member || member.householdId !== task.householdId) {
+      throw new Error("Member does not belong to this household");
+    }
+
+    // Verify user has access to this household
+    const userMembership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", task.householdId))
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .first();
+
+    if (!userMembership) {
+      throw new Error("User is not a member of this household");
+    }
+
+    // Assign task to the specified member
+    await ctx.db.patch(args.taskId, { assignedTo: args.assignedTo });
+
+    return await ctx.db.get(args.taskId);
+  },
+});
+
+/**
  * Get tasks for picker modal
  * Returns three categories: À faire, Vous faites souvent, Vous pourriez faire
  */
@@ -504,49 +558,54 @@ export const getTasksForPicker = query({
     }
 
     // Categorize tasks
-    const aFaire = [];
-    const vousFaitesSouvent = [];
-    const vousPourriezFaire = [];
+    const toDo = [];
+    const frequentTasks = [];
+    const otherTasks = [];
 
     for (const task of allTasks) {
       const isCompletedToday = todayCompletedTaskIds.has(task._id);
-      const isVisible = isTaskVisibleToday(task, isCompletedToday);
 
-      if (!isVisible) continue;
+      if (task.type === "one-time") {
+        // For one-time tasks, check visibility
+        const isVisible = isTaskVisibleToday(task, isCompletedToday);
+        if (!isVisible) continue;
 
-      if (task.type === "one-time" && task.scheduling?.dueDate) {
-        // À faire: one-time tasks with due date
-        aFaire.push(task);
+        if (task.scheduling?.dueDate) {
+          // À faire: one-time tasks with due date
+          toDo.push(task);
+        }
       } else if (task.type === "flexible") {
+        // For flexible tasks, always show them (even if completed today)
+        // Categorize by completion count
         const completionCount = completionCountByTask.get(task._id) || 0;
-        if (completionCount >= 3) {
-          // Vous faites souvent: flexible tasks completed 3+ times by member
-          vousFaitesSouvent.push(task);
+        if (completionCount > 2) {
+          // Vous faites souvent: flexible tasks completed more than 2 times by member
+          frequentTasks.push(task);
         } else {
-          // Vous pourriez faire: flexible tasks completed <3 times
-          vousPourriezFaire.push(task);
+          // Vous pourriez faire: flexible tasks completed 2 times or less
+          otherTasks.push(task);
         }
       }
     }
 
-    // Sort À faire by due date
-    aFaire.sort((a, b) => {
+    // Sort toDo by due date
+    toDo.sort((a, b) => {
       const dateA = a.scheduling?.dueDate || 0;
       const dateB = b.scheduling?.dueDate || 0;
       return dateA - dateB;
     });
 
-    // Sort Vous faites souvent by completion count (descending)
-    vousFaitesSouvent.sort((a, b) => {
+    // Sort frequentTasks by completion count (descending)
+    frequentTasks.sort((a, b) => {
       const countA = completionCountByTask.get(a._id) || 0;
       const countB = completionCountByTask.get(b._id) || 0;
       return countB - countA;
     });
 
     return {
-      aFaire,
-      vousFaitesSouvent,
-      vousPourriezFaire,
+      toDo,
+      frequentTasks,
+      otherTasks,
       completionCounts: Object.fromEntries(completionCountByTask),
     };
   },

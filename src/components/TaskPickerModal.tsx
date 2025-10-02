@@ -6,10 +6,11 @@ import {useEffect} from "react";
 interface TaskPickerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  aFaire: Doc<"tasks">[];
-  vousFaitesSouvent: Doc<"tasks">[];
-  vousPourriezFaire: Doc<"tasks">[];
+  toDo: Doc<"tasks">[];
+  frequentTasks: Doc<"tasks">[];
+  otherTasks: Doc<"tasks">[];
   completionCounts: Map<string, number>;
+  onTaskSelect: (task: Doc<"tasks">) => void;
 }
 
 interface TaskItemProps {
@@ -101,14 +102,14 @@ function TaskSection({title, tasks, emptyMessage, onTaskClick, getSubtitle, esti
 export function TaskPickerModal({
   open,
   onOpenChange,
-  aFaire,
-  vousFaitesSouvent,
-  vousPourriezFaire,
+  toDo,
+  frequentTasks,
+  otherTasks,
   completionCounts,
+  onTaskSelect,
 }: TaskPickerModalProps) {
   const handleTaskClick = (task: Doc<"tasks">) => {
-    console.log("Task clicked:", task.title);
-    // TODO: Implement task completion flow
+    onTaskSelect(task);
   };
 
   // Block body scroll when modal is open
@@ -162,7 +163,7 @@ export function TaskPickerModal({
 
               <TaskSection
                 title="À faire"
-                tasks={aFaire}
+                tasks={toDo}
                 emptyMessage="Aucune tâche avec échéance pour le moment"
                 onTaskClick={handleTaskClick}
                 getSubtitle={(task) =>
@@ -173,7 +174,7 @@ export function TaskPickerModal({
 
               <TaskSection
                 title="Vous faites souvent"
-                tasks={vousFaitesSouvent}
+                tasks={frequentTasks}
                 emptyMessage="Aucune tâche fréquente pour le moment"
                 onTaskClick={handleTaskClick}
                 getSubtitle={(task) => {
@@ -185,7 +186,7 @@ export function TaskPickerModal({
 
               <TaskSection
                 title="Vous pourriez faire"
-                tasks={vousPourriezFaire}
+                tasks={otherTasks}
                 emptyMessage="Aucune autre tâche disponible"
                 onTaskClick={handleTaskClick}
                 getSubtitle={(task) => {
