@@ -1,15 +1,12 @@
 import {useQuery} from "convex/react";
 import {api} from "../../convex/_generated/api";
-import {Id, Doc} from "../../convex/_generated/dataModel";
+import {Id} from "../../convex/_generated/dataModel";
 import {formatCompletionDate} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
-import {TaskPickerModal} from "@/components/TaskPickerModal";
-import {TaskDetailModal} from "@/components/TaskDetailModal";
-import {useActiveMember} from "@/contexts/MemberContext";
-import {useState} from "react";
 import {Page} from "@/components/Page.tsx";
 import {AuthenticatedHeader} from "@/components/AuthenticatedHeader.tsx";
 import {BottomNavbar} from "@/components/BottomNavbar.tsx";
+import {Link} from "react-router-dom";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -85,26 +82,11 @@ function getDynamicTitle(recentCompletions: any[]): string {
 }
 
 export function HouseholdDashboard({household}: HouseholdDashboardProps) {
-  const [isTaskPickerOpen, setIsTaskPickerOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Doc<"tasks"> | null>(null);
-  const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
-  const { activeMemberId } = useActiveMember();
-
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
 
-  const tasksForPicker = useQuery(
-    api.tasks.getTasksForPicker,
-    activeMemberId
-      ? {
-          householdId: household.id,
-          memberId: activeMemberId,
-        }
-      : "skip"
-  );
-
-  if (recentCompletions === undefined || tasksForPicker === undefined) {
+  if (recentCompletions === undefined) {
     return (
       <div className="w-full max-w-2xl mx-auto py-8">
         <div className="text-center">
@@ -116,15 +98,6 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   const title = getDynamicTitle(recentCompletions);
 
-  const handleTaskSelect = (task: Doc<"tasks">) => {
-    setSelectedTask(task);
-    setIsTaskDetailOpen(true);
-  };
-
-  const handleTaskCompleted = () => {
-    setIsTaskDetailOpen(false);
-  };
-
   return (
     <Page>
       <AuthenticatedHeader />
@@ -132,12 +105,12 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
       <div className="px-4 w-full max-w-2xl mx-auto">
         {/* Action section with "Faire quelque chose" button */}
         <div className="flex items-center justify-center min-h-[300px] mb-8">
-          <button
-            onClick={() => setIsTaskPickerOpen(true)}
+          <Link
+            to="/get-it-done"
             className="px-8 py-4 text-xl font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-md"
           >
             Faire quelque chose
-          </button>
+          </Link>
         </div>
 
         <h2 className="text-center text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
@@ -159,26 +132,6 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
             ))}
           </div>
         )}
-
-        {/* Task Picker Modal */}
-        <TaskPickerModal
-          open={isTaskPickerOpen}
-          onOpenChange={setIsTaskPickerOpen}
-          toDo={tasksForPicker.toDo}
-          frequentTasks={tasksForPicker.frequentTasks}
-          otherTasks={tasksForPicker.otherTasks}
-          completionCounts={new Map(Object.entries(tasksForPicker.completionCounts))}
-          onTaskSelect={handleTaskSelect}
-        />
-
-        {/* Task Detail Modal */}
-        <TaskDetailModal
-          open={isTaskDetailOpen}
-          onOpenChange={setIsTaskDetailOpen}
-          task={selectedTask}
-          activeMemberId={activeMemberId || undefined}
-          onTaskCompleted={handleTaskCompleted}
-        />
       </div>
       <BottomNavbar />
     </Page>

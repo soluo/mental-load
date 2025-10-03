@@ -4,6 +4,8 @@ import { api } from "../convex/_generated/api";
 import { FamilyManagement } from "@/components/FamilyManagement";
 import { HouseholdSetup } from "@/pages/HouseholdSetup";
 import { HouseholdDashboard } from "@/pages/HouseholdDashboard";
+import { GetItDone } from "@/pages/GetItDone";
+import { Member } from "@/pages/Member";
 import { Toaster } from "sonner";
 import { Registration } from "@/pages/Registration.tsx";
 import { useActiveMember } from "@/contexts/MemberContext";
@@ -50,6 +52,8 @@ function Content() {
         {household ? (
           <Routes>
             <Route path="/" element={<HouseholdDashboard household={household} />} />
+            <Route path="/get-it-done" element={<GetItDone household={household} />} />
+            <Route path="/member" element={<Member />} />
             <Route path="/family" element={<FamilyManagement household={household} />} />
           </Routes>
         ) : (
