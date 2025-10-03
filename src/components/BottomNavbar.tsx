@@ -1,34 +1,42 @@
+import {
+  CircleCheckBig as GetItDoneIcon,
+  Activity as ActivityIcon,
+  MenuSquareIcon as SettingsIcon
+} from 'lucide-react';
 import { NavLink } from "react-router-dom";
 
 export function BottomNavbar() {
   return (
     <div className="fixed bottom-0 inset-x-0">
-      <div className="bg-white/70 backdrop-blur">
-        <nav className="flex justify-around gap-2">
+      <div className="bg-muted/70 backdrop-blur">
+        <nav className="flex justify-around gap-2 py-2">
           <NavLink
             to="/"
             end
             className={({ isActive }) =>
-              `flex flex-col py-4 ${isActive ? 'text-slate-900 font-semibold' : 'text-slate-500'}`
+              `flex-1 flex flex-col items-center gap-1 py-1 [&>span]:text-tiny ${isActive ? 'font-bold text-menu-active [&>svg]:text-menu-active-icon' : ''}`
             }
           >
-            <span className="text-xs">Activité</span>
+            <ActivityIcon size={20} />
+            <span>Activité</span>
           </NavLink>
           <NavLink
             to="/get-it-done"
             className={({ isActive }) =>
-              `flex flex-col py-4 ${isActive ? 'text-slate-900 font-semibold' : 'text-slate-500'}`
+              `flex-1 flex flex-col items-center gap-1 py-1 [&>span]:text-tiny ${isActive ? 'font-bold text-menu-active [&>svg]:text-menu-active-icon' : ''}`
             }
           >
-            <span className="text-xs">Faire</span>
+            <GetItDoneIcon size={20} />
+            <span>Faire</span>
           </NavLink>
           <NavLink
             to="/member"
             className={({ isActive }) =>
-              `flex flex-col py-4 ${isActive ? 'text-slate-900 font-semibold' : 'text-slate-500'}`
+              `flex-1 flex flex-col items-center gap-1 py-1 [&>span]:text-tiny ${isActive ? 'font-bold text-menu-active [&>svg]:text-menu-active-icon' : ''}`
             }
           >
-            <span className="text-xs">Réglages</span>
+            <SettingsIcon size={20} />
+            <span>Menu</span>
           </NavLink>
         </nav>
       </div>

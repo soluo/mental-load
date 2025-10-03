@@ -14,7 +14,7 @@ import { useEffect } from "react";
 
 export default function App() {
   return (
-    <div className="min-h-dvh flex flex-col bg-stone-100">
+    <div className="min-h-dvh flex flex-col bg-background">
       <Content />
       <Toaster position="bottom-center" />
     </div>

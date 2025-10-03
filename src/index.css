@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+@theme {
+    --text-tiny: 0.625rem;
+    --text-tiny--line-height: .75rem;
+    --text-tiny--letter-spacing: 0.0125rem;
+    --text-tiny--font-weight: 500;
+}
+
 :root {
     --background: oklch(0.9885 0.0057 84.5659);
     --foreground: oklch(0.3660 0.0251 49.6085);
@@ -33,6 +40,8 @@
     --sidebar-accent-foreground: oklch(1.0000 0 0);
     --sidebar-border: oklch(0.8866 0.0404 89.6994);
     --sidebar-ring: oklch(0.5553 0.1455 48.9975);
+    --menu-active: oklch(0.667 0.295 322.15);
+    --menu-active-icon: oklch(0.667 0.295 322.15);
     --font-sans: Oxanium, sans-serif;
     --font-serif: Merriweather, serif;
     --font-mono: Fira Code, monospace;
@@ -141,6 +150,8 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+    --color-menu-active: var(--menu-active);
+    --color-menu-active-icon: var(--menu-active-icon);
 
     --font-sans: var(--font-sans);
     --font-mono: var(--font-mono);
