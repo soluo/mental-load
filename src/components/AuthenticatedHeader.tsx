@@ -66,7 +66,7 @@ export function AuthenticatedHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm h-16 flex justify-between items-center border-b border-slate-200 shadow-sm px-6">
+    <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm h-16 flex justify-between items-center px-6">
       <h2 className="text-xl font-semibold text-slate-900">{householdName}</h2>
 
       <DropdownMenu>

@@ -10,13 +10,28 @@ import { Toaster } from "sonner";
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Authenticated>
         <AuthenticatedHeader />
       </Authenticated>
       <main className="flex-1 flex justify-center p-4">
         <Content />
       </main>
+      <div className="fixed bottom-0 inset-x-0">
+        <div className="bg-white/70 backdrop-blur">
+          <nav className="flex justify-around gap-2">
+            <button className="flex flex-col py-4">
+              <span className="text-xs text-slate-500">Activité</span>
+            </button>
+            <button className="flex flex-col py-4">
+              <span className="text-xs text-slate-500">Faire</span>
+            </button>
+            <button className="flex flex-col py-4">
+              <span className="text-xs text-slate-500">Réglages</span>
+            </button>
+          </nav>
+        </div>
+      </div>
       <Toaster position="bottom-center" />
     </div>
   );
