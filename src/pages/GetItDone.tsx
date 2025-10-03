@@ -131,7 +131,6 @@ export function GetItDone({ household }: GetItDoneProps) {
   if (tasksForPicker === undefined) {
     return (
       <Page>
-        <AuthenticatedHeader />
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
         </div>
@@ -149,13 +148,13 @@ export function GetItDone({ household }: GetItDoneProps) {
   };
 
   return (
-    <Page>
-      <AuthenticatedHeader />
+    <Page className="pt-14 pb-8">
+      <header className="fixed top-0 inset-x-0 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
-      <div className="w-full max-w-md mx-auto px-4 pb-8">
-        <h2 className="text-2xl font-bold text-slate-900 mb-8 px-2">
+      <div className="px-4 w-full max-w-2xl mx-auto">
+        <h1 className="px-2 mb-8 text-3xl font-semibold text-stone-950">
           Faire quelque chose
-        </h2>
+        </h1>
 
         <TaskSection
           title="À faire"

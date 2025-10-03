@@ -8,7 +8,7 @@ import { NavLink } from "react-router-dom";
 export function BottomNavbar() {
   return (
     <div className="fixed bottom-0 inset-x-0">
-      <div className="bg-muted/70 backdrop-blur">
+      <div className="bg-background/70 backdrop-blur border-t border-foreground/10">
         <nav className="flex justify-around gap-2 py-2">
           <NavLink
             to="/"

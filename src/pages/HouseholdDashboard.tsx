@@ -4,7 +4,6 @@ import {Id} from "../../convex/_generated/dataModel";
 import {formatCompletionDate} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
-import {AuthenticatedHeader} from "@/components/AuthenticatedHeader.tsx";
 import {Link} from "react-router-dom";
 
 interface Member {
@@ -98,10 +97,11 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   const title = getDynamicTitle(recentCompletions);
 
   return (
-    <Page>
-      <AuthenticatedHeader />
+    <Page className="pt-14 pb-8">
+      <header className="fixed top-0 inset-x-0 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
       <div className="px-4 w-full max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-stone-950">Activité</h1>
         {/* Action section with "Faire quelque chose" button */}
         <div className="flex items-center justify-center min-h-[300px] mb-8">
           <Link
@@ -112,7 +112,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
           </Link>
         </div>
 
-        <h2 className="text-center text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
+        <h2 className="text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
 
         {recentCompletions.length === 0 ? (
           <div className="text-center py-12">
