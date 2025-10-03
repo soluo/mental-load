@@ -1,6 +1,5 @@
 import { Page } from "@/components/Page";
 import { AuthenticatedHeader } from "@/components/AuthenticatedHeader";
-import { BottomNavbar } from "@/components/BottomNavbar";
 
 export function Member() {
   return (
@@ -16,8 +15,6 @@ export function Member() {
           Page de réglages à venir...
         </p>
       </div>
-
-      <BottomNavbar />
     </Page>
   );
 }

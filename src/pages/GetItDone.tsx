@@ -2,7 +2,6 @@ import { CircleIcon } from 'lucide-react';
 import { Doc, Id } from "../../convex/_generated/dataModel";
 import { Page } from "@/components/Page";
 import { AuthenticatedHeader } from "@/components/AuthenticatedHeader";
-import { BottomNavbar } from "@/components/BottomNavbar";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useActiveMember } from "@/contexts/MemberContext";
@@ -136,7 +135,6 @@ export function GetItDone({ household }: GetItDoneProps) {
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
         </div>
-        <BottomNavbar />
       </Page>
     );
   }
@@ -203,8 +201,6 @@ export function GetItDone({ household }: GetItDoneProps) {
         activeMemberId={activeMemberId || undefined}
         onTaskCompleted={handleTaskCompleted}
       />
-
-      <BottomNavbar />
     </Page>
   );
 }

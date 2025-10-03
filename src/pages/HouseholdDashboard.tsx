@@ -5,7 +5,6 @@ import {formatCompletionDate} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
 import {AuthenticatedHeader} from "@/components/AuthenticatedHeader.tsx";
-import {BottomNavbar} from "@/components/BottomNavbar.tsx";
 import {Link} from "react-router-dom";
 
 interface Member {
@@ -133,7 +132,6 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
           </div>
         )}
       </div>
-      <BottomNavbar />
     </Page>
   );
 }
