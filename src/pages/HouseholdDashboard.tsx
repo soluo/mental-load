@@ -7,6 +7,9 @@ import {TaskPickerModal} from "@/components/TaskPickerModal";
 import {TaskDetailModal} from "@/components/TaskDetailModal";
 import {useActiveMember} from "@/contexts/MemberContext";
 import {useState} from "react";
+import {Page} from "@/components/Page.tsx";
+import {AuthenticatedHeader} from "@/components/AuthenticatedHeader.tsx";
+import {BottomNavbar} from "@/components/BottomNavbar.tsx";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -41,8 +44,8 @@ function TaskCompletionItem({
   duration,
 }: TaskCompletionItemProps) {
   return (
-    <div className="bg-gray-100/25 flex gap-2 p-1.5 border border-gray-300 rounded-full">
-      <div className="shrink-0 flex items-center justify-center size-12 bg-gray-500/10 rounded-full">
+    <div className="bg-white/80 flex gap-2 p-1.5 border border-gray-300 rounded-full">
+      <div className="shrink-0 flex items-center justify-center size-12 bg-gray-100/10 rounded-full">
         <CheckIcon className="h-5 w-5 text-lime-500"/>
       </div>
       <div className="flex-1 min-w-0">
@@ -100,7 +103,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
         }
       : "skip"
   );
-
+  console.log(recentCompletions);
   if (recentCompletions === undefined || tasksForPicker === undefined) {
     return (
       <div className="w-full max-w-2xl mx-auto py-8">
@@ -123,56 +126,61 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* Action section with "Faire quelque chose" button */}
-      <div className="flex items-center justify-center min-h-[300px] mb-8">
-        <button
-          onClick={() => setIsTaskPickerOpen(true)}
-          className="px-8 py-4 text-xl font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-md"
-        >
-          Faire quelque chose
-        </button>
+    <Page>
+      <AuthenticatedHeader />
+
+      <div className="px-4 w-full max-w-2xl mx-auto">
+        {/* Action section with "Faire quelque chose" button */}
+        <div className="flex items-center justify-center min-h-[300px] mb-8">
+          <button
+            onClick={() => setIsTaskPickerOpen(true)}
+            className="px-8 py-4 text-xl font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-md"
+          >
+            Faire quelque chose
+          </button>
+        </div>
+
+        <h2 className="text-center text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
+
+        {recentCompletions.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-slate-600">Commencez par créer des tâches</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {recentCompletions.map((completion) => (
+              <TaskCompletionItem
+                key={completion._id}
+                taskTitle={completion.task?.title || "Tâche supprimée"}
+                completedAt={completion.completedAt}
+                memberName={completion.member?.firstName || "Membre inconnu"}
+                duration={completion.duration}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Task Picker Modal */}
+        <TaskPickerModal
+          open={isTaskPickerOpen}
+          onOpenChange={setIsTaskPickerOpen}
+          toDo={tasksForPicker.toDo}
+          frequentTasks={tasksForPicker.frequentTasks}
+          otherTasks={tasksForPicker.otherTasks}
+          completionCounts={new Map(Object.entries(tasksForPicker.completionCounts))}
+          onTaskSelect={handleTaskSelect}
+        />
+
+        {/* Task Detail Modal */}
+        <TaskDetailModal
+          open={isTaskDetailOpen}
+          onOpenChange={setIsTaskDetailOpen}
+          task={selectedTask}
+          activeMemberId={activeMemberId || undefined}
+          onTaskCompleted={handleTaskCompleted}
+        />
       </div>
-
-      <h2 className="text-center text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
-
-      {recentCompletions.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-slate-600">Commencez par créer des tâches</p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {recentCompletions.map((completion) => (
-            <TaskCompletionItem
-              key={completion._id}
-              taskTitle={completion.task?.title || "Tâche supprimée"}
-              completedAt={completion.completedAt}
-              memberName={completion.member?.firstName || "Membre inconnu"}
-              duration={completion.duration}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Task Picker Modal */}
-      <TaskPickerModal
-        open={isTaskPickerOpen}
-        onOpenChange={setIsTaskPickerOpen}
-        toDo={tasksForPicker.toDo}
-        frequentTasks={tasksForPicker.frequentTasks}
-        otherTasks={tasksForPicker.otherTasks}
-        completionCounts={new Map(Object.entries(tasksForPicker.completionCounts))}
-        onTaskSelect={handleTaskSelect}
-      />
-
-      {/* Task Detail Modal */}
-      <TaskDetailModal
-        open={isTaskDetailOpen}
-        onOpenChange={setIsTaskDetailOpen}
-        task={selectedTask}
-        activeMemberId={activeMemberId || undefined}
-        onTaskCompleted={handleTaskCompleted}
-      />
-    </div>
+      <BottomNavbar />
+    </Page>
   );
 }

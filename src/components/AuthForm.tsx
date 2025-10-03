@@ -41,7 +41,7 @@ export function AuthForm() {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+      <div className="p-5">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-semibold text-slate-900 mb-2">
             {isSignUp ? "Créer un compte" : "Se connecter"}
