@@ -6,6 +6,8 @@ import { HouseholdSetup } from "@/pages/HouseholdSetup";
 import { HouseholdDashboard } from "@/pages/HouseholdDashboard";
 import { Toaster } from "sonner";
 import { Registration } from "@/pages/Registration.tsx";
+import { useActiveMember } from "@/contexts/MemberContext";
+import { useEffect } from "react";
 
 export default function App() {
   return (
@@ -19,6 +21,20 @@ export default function App() {
 function Content() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
   const household = useQuery(api.households.getCurrentHousehold);
+  const { activeMemberId, setActiveMemberId } = useActiveMember();
+
+  // Initialize activeMemberId when household is loaded
+  useEffect(() => {
+    if (household?.members && household.members.length > 0) {
+      if (!activeMemberId) {
+        setActiveMemberId(household.members[0].id);
+      }
+      // If the active member was deleted, select the first available member
+      else if (!household.members.find((m) => m.id === activeMemberId)) {
+        setActiveMemberId(household.members[0].id);
+      }
+    }
+  }, [household?.members, activeMemberId, setActiveMemberId]);
 
   if (loggedInUser === undefined || household === undefined) {
     return (

@@ -8,7 +8,7 @@ interface MemberContextType {
 
 const MemberContext = createContext<MemberContextType | undefined>(undefined);
 
-const STORAGE_KEY = "ensemble_active_member_id";
+const STORAGE_KEY = "app_active_member_id";
 
 export function MemberProvider({ children }: { children: ReactNode }) {
   const [activeMemberId, setActiveMemberIdState] = useState<Id<"householdMembers"> | null>(() => {

@@ -103,7 +103,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
         }
       : "skip"
   );
-  console.log(recentCompletions);
+
   if (recentCompletions === undefined || tasksForPicker === undefined) {
     return (
       <div className="w-full max-w-2xl mx-auto py-8">

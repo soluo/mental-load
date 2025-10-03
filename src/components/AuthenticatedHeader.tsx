@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useActiveMember } from "@/contexts/MemberContext";
 import { LogOut as LogOutIcon, Users as UsersIcon, Check as CheckIcon, User as UserIcon } from "lucide-react";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
 
@@ -24,20 +23,6 @@ export function AuthenticatedHeader() {
   const navigate = useNavigate();
   const { activeMemberId, setActiveMemberId } = useActiveMember();
 
-  // Set the first member as active by default if none selected
-  useEffect(() => {
-    if (household?.members && household.members.length > 0) {
-      if (!activeMemberId) {
-        setActiveMemberId(household.members[0].id);
-      }
-      // If the active member was deleted, select the first available member
-      else if (!household.members.find((m) => m.id === activeMemberId)) {
-        setActiveMemberId(household.members[0].id);
-      }
-    }
-  }, [household?.members, activeMemberId, setActiveMemberId]);
-
-  // État de chargement
   if (loggedInUser === undefined || household === undefined) {
     return (
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm h-16 flex justify-between items-center border-b border-slate-200 shadow-sm px-6">
