@@ -1,12 +1,11 @@
 import { CircleIcon } from 'lucide-react';
 import { Doc, Id } from "../../convex/_generated/dataModel";
 import { Page } from "@/components/Page";
-import { AuthenticatedHeader } from "@/components/AuthenticatedHeader";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useActiveMember } from "@/contexts/MemberContext";
 import { useState } from "react";
-import { TaskDetailModal } from "@/components/TaskDetailModal";
+import { TaskCompletionDetail } from "@/components/TaskCompletionDetail";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -192,8 +191,8 @@ export function GetItDone({ household }: GetItDoneProps) {
         />
       </div>
 
-      {/* Task Detail Modal */}
-      <TaskDetailModal
+      {/* Task Completion Detail */}
+      <TaskCompletionDetail
         open={isTaskDetailOpen}
         onOpenChange={setIsTaskDetailOpen}
         task={selectedTask}
