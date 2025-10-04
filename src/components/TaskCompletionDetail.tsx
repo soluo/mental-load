@@ -120,7 +120,7 @@ export function TaskCompletionDetail({
   const canAssign = task.type === 'one-time' && !task.assignedTo && !task.isCompleted && activeMemberId;
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent>
         <div className="w-full max-w-md mx-auto pb-8 px-4">
           <DrawerHeader className="px-0">
@@ -262,7 +262,7 @@ export function TaskCompletionDetail({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Ajoutez des détails sur cette réalisation..."
-                    className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+                    className="w-full min-h-[100px] px-3 py-2 sm:text-sm rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
                   />
                 </>
               )}
