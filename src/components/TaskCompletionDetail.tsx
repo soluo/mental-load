@@ -123,7 +123,7 @@ export function TaskCompletionDetail({
   return (
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent>
-        <div className="w-full max-w-md mx-auto pb-8 px-4">
+        <div className="w-full max-w-md mx-auto px-4">
           <DrawerHeader className="px-0">
             <DrawerTitle className="text-2xl mb-2">
               {task.title}
