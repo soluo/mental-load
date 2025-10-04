@@ -1,4 +1,4 @@
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
@@ -67,6 +67,106 @@ export const getRecentCompletions = query({
     );
 
     return enrichedCompletions;
+  },
+});
+
+/**
+ * Get detailed information about a specific task completion
+ */
+export const getTaskCompletionDetails = query({
+  args: {
+    completionId: v.id("taskCompletions"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Get the completion
+    const completion = await ctx.db.get(args.completionId);
+    if (!completion) {
+      throw new Error("Task completion not found");
+    }
+
+    // Verify user belongs to the household
+    const membership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", completion.householdId))
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .first();
+
+    if (!membership) {
+      throw new Error("User is not a member of this household");
+    }
+
+    // Get task and member details
+    const task = await ctx.db.get(completion.taskId);
+    const member = await ctx.db.get(completion.completedBy);
+
+    return {
+      _id: completion._id,
+      completedAt: completion.completedAt,
+      duration: completion.duration,
+      notes: completion.notes,
+      completedBy: completion.completedBy,
+      task: task
+        ? {
+            _id: task._id,
+            title: task.title,
+            description: task.description,
+            type: task.type,
+          }
+        : null,
+      member: member
+        ? {
+            _id: member._id,
+            firstName: member.firstName,
+          }
+        : null,
+    };
+  },
+});
+
+/**
+ * Update an existing task completion
+ */
+export const updateTaskCompletion = mutation({
+  args: {
+    completionId: v.id("taskCompletions"),
+    duration: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Get the completion
+    const completion = await ctx.db.get(args.completionId);
+    if (!completion) {
+      throw new Error("Task completion not found");
+    }
+
+    // Get the member who completed the task
+    const completedByMember = await ctx.db.get(completion.completedBy);
+    if (!completedByMember) {
+      throw new Error("Member not found");
+    }
+
+    // Verify the current user is the one who completed the task
+    if (completedByMember.userId !== userId) {
+      throw new Error("You can only edit your own task completions");
+    }
+
+    // Update the completion
+    await ctx.db.patch(args.completionId, {
+      duration: args.duration,
+      notes: args.notes,
+    });
+
+    return { success: true };
   },
 });
 

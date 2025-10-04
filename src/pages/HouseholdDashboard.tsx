@@ -6,6 +6,9 @@ import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
 import {Link} from "react-router-dom";
 import {Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup} from "@/components/ui/item";
+import {useState} from "react";
+import {TaskCompletionViewer} from "@/components/TaskCompletionViewer";
+import {useActiveMember} from "@/contexts/MemberContext";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -31,6 +34,7 @@ interface TaskCompletionItemProps {
   completedAt: number;
   memberName: string;
   duration?: number;
+  onClick: () => void;
 }
 
 function TaskCompletionItem({
@@ -38,24 +42,27 @@ function TaskCompletionItem({
   completedAt,
   memberName,
   duration,
+  onClick,
 }: TaskCompletionItemProps) {
   return (
-    <Item variant="outline" className="bg-white" size="sm">
-      <ItemMedia>
-        <CheckIcon size={20} className="text-lime-500"/>
-      </ItemMedia>
+    <Item asChild variant="outline" className="bg-white" size="sm">
+      <button onClick={onClick} className="w-full text-left">
+        <ItemMedia>
+          <CheckIcon size={20} className="text-lime-500"/>
+        </ItemMedia>
 
-      <ItemContent className="gap-0">
-        <ItemTitle className="leading-6">{taskTitle}</ItemTitle>
-        <ItemDescription className="leading-5">
-          {memberName} • {formatCompletionDate(completedAt)}
-        </ItemDescription>
-      </ItemContent>
-      {duration && (
-        <ItemActions>
-          <span className="text-xs text-muted-foreground">{duration} mn</span>
-        </ItemActions>
-      )}
+        <ItemContent className="gap-0">
+          <ItemTitle className="leading-6">{taskTitle}</ItemTitle>
+          <ItemDescription className="leading-5">
+            {memberName} • {formatCompletionDate(completedAt)}
+          </ItemDescription>
+        </ItemContent>
+        {duration && (
+          <ItemActions>
+            <span className="text-xs text-muted-foreground">{duration} mn</span>
+          </ItemActions>
+        )}
+      </button>
     </Item>
   );
 }
@@ -80,6 +87,10 @@ function getDynamicTitle(recentCompletions: any[]): string {
 }
 
 export function HouseholdDashboard({household}: HouseholdDashboardProps) {
+  const { activeMemberId } = useActiveMember();
+  const [selectedCompletionId, setSelectedCompletionId] = useState<Id<"taskCompletions"> | null>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
@@ -95,6 +106,11 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   }
 
   const title = getDynamicTitle(recentCompletions);
+
+  const handleCompletionClick = (completionId: Id<"taskCompletions">) => {
+    setSelectedCompletionId(completionId);
+    setIsViewerOpen(true);
+  };
 
   return (
     <Page className="pt-14 pb-8">
@@ -127,11 +143,20 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
                 completedAt={completion.completedAt}
                 memberName={completion.member?.firstName || "Membre inconnu"}
                 duration={completion.duration}
+                onClick={() => handleCompletionClick(completion._id)}
               />
             ))}
           </ItemGroup>
         )}
       </div>
+
+      {/* Task Completion Viewer */}
+      <TaskCompletionViewer
+        open={isViewerOpen}
+        onOpenChange={setIsViewerOpen}
+        completionId={selectedCompletionId}
+        activeMemberId={activeMemberId || undefined}
+      />
     </Page>
   );
 }
