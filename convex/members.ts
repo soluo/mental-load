@@ -2,6 +2,17 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+const AVAILABLE_COLORS = [
+  "orange",
+  "blue",
+  "pink",
+  "green",
+  "purple",
+  "red",
+  "yellow",
+  "indigo",
+];
+
 export const addMember = mutation({
   args: {
     householdId: v.id("households"),
@@ -25,12 +36,34 @@ export const addMember = mutation({
       throw new Error("Not authorized to add members to this household");
     }
 
+    // Get existing members to find used colors
+    const existingMembers = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", args.householdId))
+      .collect();
+
+    const usedColors = existingMembers
+      .map((m) => m.color)
+      .filter((c): c is string => !!c);
+
+    // Find available colors
+    const availableColors = AVAILABLE_COLORS.filter(
+      (c) => !usedColors.includes(c)
+    );
+
+    // Pick a random color (from available or all if none available)
+    const colorsToChooseFrom =
+      availableColors.length > 0 ? availableColors : AVAILABLE_COLORS;
+    const randomColor =
+      colorsToChooseFrom[Math.floor(Math.random() * colorsToChooseFrom.length)];
+
     // Create the member
     const memberId = await ctx.db.insert("householdMembers", {
       householdId: args.householdId,
       firstName: args.firstName,
       role: args.role,
       email: args.email,
+      color: randomColor,
       userId: undefined,
       joinedAt: Date.now(),
     });

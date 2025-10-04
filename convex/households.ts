@@ -89,6 +89,7 @@ export const getCurrentHousehold = query({
         firstName: member.firstName!,
         role: member.role!,
         email: member.email,
+        color: member.color,
         joinedAt: member.joinedAt,
       }));
 

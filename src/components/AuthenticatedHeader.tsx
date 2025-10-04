@@ -41,6 +41,7 @@ export function AuthenticatedHeader() {
   ) : (
     <UserIcon className="h-5 w-5" />
   );
+  const memberColor = activeMember?.color;
 
   const handleMemberChange = (memberId: Id<"householdMembers">) => {
     const member = household?.members?.find((m) => m.id === memberId);
@@ -57,7 +58,7 @@ export function AuthenticatedHeader() {
       <DropdownMenu>
         <DropdownMenuTrigger className="focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded-full select-none">
           <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-slate-200 text-slate-700 font-medium">
+            <AvatarFallback color={memberColor} className="font-medium">
               {avatarContent}
             </AvatarFallback>
           </Avatar>

@@ -264,6 +264,111 @@ export const getMemberStats = query({
 });
 
 /**
+ * Get daily activity stats for all members in a household (last 7 days)
+ */
+export const getMembersDailyActivity = query({
+  args: {
+    householdId: v.id("households"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Verify user belongs to household
+    const membership = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", args.householdId))
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .first();
+
+    if (!membership) {
+      throw new Error("User is not a member of this household");
+    }
+
+    // Get all members
+    const members = await ctx.db
+      .query("householdMembers")
+      .withIndex("by_household", (q) => q.eq("householdId", args.householdId))
+      .collect();
+
+    // Get completions from the last 7 days
+    const now = Date.now();
+    const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+
+    const completions = await ctx.db
+      .query("taskCompletions")
+      .withIndex("by_household_date", (q) =>
+        q.eq("householdId", args.householdId).gte("completedAt", sevenDaysAgo)
+      )
+      .collect();
+
+    // Create maps for member -> daily stats (minutes and task count)
+    const memberDailyMinutes = new Map<string, Map<string, number>>();
+    const memberDailyTaskCount = new Map<string, Map<string, number>>();
+
+    // Initialize all members with empty daily stats
+    for (const member of members) {
+      memberDailyMinutes.set(member._id, new Map());
+      memberDailyTaskCount.set(member._id, new Map());
+    }
+
+    // Aggregate completions by member and day
+    for (const completion of completions) {
+      const memberId = completion.completedBy;
+      const date = new Date(completion.completedAt);
+      const dayKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+      const minutesMap = memberDailyMinutes.get(memberId);
+      const taskCountMap = memberDailyTaskCount.get(memberId);
+
+      if (minutesMap && taskCountMap) {
+        const currentMinutes = minutesMap.get(dayKey) ?? 0;
+        minutesMap.set(dayKey, currentMinutes + (completion.duration ?? 0));
+
+        const currentTaskCount = taskCountMap.get(dayKey) ?? 0;
+        taskCountMap.set(dayKey, currentTaskCount + 1);
+      }
+    }
+
+    // Build result array with 7 days of data for each member
+    const dayNames = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+    const result = members.map((member) => {
+      const dailyStats: Array<{ day: string; date: number; minutes: number; taskCount: number }> = [];
+
+      // Generate last 7 days (J-6 to J)
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now - i * 24 * 60 * 60 * 1000);
+        const dayKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        const dayName = dayNames[date.getDay()];
+
+        const minutesMap = memberDailyMinutes.get(member._id);
+        const taskCountMap = memberDailyTaskCount.get(member._id);
+        const minutes = minutesMap?.get(dayKey) ?? 0;
+        const taskCount = taskCountMap?.get(dayKey) ?? 0;
+
+        dailyStats.push({
+          day: dayName,
+          date: date.getTime(),
+          minutes,
+          taskCount,
+        });
+      }
+
+      return {
+        memberId: member._id,
+        firstName: member.firstName ?? "Membre",
+        color: member.color,
+        dailyStats,
+      };
+    });
+
+    return result;
+  },
+});
+
+/**
  * Get weekly report for a household
  */
 export const getHouseholdWeeklyReport = query({

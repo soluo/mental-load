@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users as UsersIcon, UserPlus as UserPlusIcon, Mail as MailIcon, Trash2 as Trash2Icon, X as XIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
@@ -26,6 +27,7 @@ interface Member {
   firstName: string;
   role: "adult" | "child";
   email?: string;
+  color?: string;
   joinedAt: number;
 }
 
@@ -138,11 +140,11 @@ export function FamilyManagement({ household }: FamilyManagementProps) {
             key={member.id}
             className="flex items-center gap-4 p-4 rounded-lg bg-white hover:bg-slate-100 transition-colors"
           >
-            <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
-              <span className="text-slate-700 font-medium text-lg">
+            <Avatar className="h-12 w-12">
+              <AvatarFallback color={member.color} className="font-medium text-lg">
                 {member.firstName[0].toUpperCase()}
-              </span>
-            </div>
+              </AvatarFallback>
+            </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-slate-900">

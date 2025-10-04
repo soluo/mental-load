@@ -4,11 +4,11 @@ import {Id} from "../../convex/_generated/dataModel";
 import {formatCompletionDate} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
-import {Link} from "react-router-dom";
 import {Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup} from "@/components/ui/item";
 import {useState} from "react";
 import {TaskCompletionViewer} from "@/components/TaskCompletionViewer";
 import {useActiveMember} from "@/contexts/MemberContext";
+import {MemberActivityGrid} from "@/components/MemberActivityGrid";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -117,16 +117,10 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
       <header className="fixed top-0 inset-x-0 z-10 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
       <div className="px-4 w-full max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-stone-950">Activité</h1>
-        {/* Action section with "Faire quelque chose" button */}
-        <div className="flex items-center justify-center min-h-[300px] mb-8">
-          <Link
-            to="/get-it-done"
-            className="px-8 py-4 text-xl font-semibold text-white bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors shadow-md"
-          >
-            Faire quelque chose
-          </Link>
-        </div>
+        <h1 className="text-3xl font-bold text-stone-950 mb-6">Activité</h1>
+
+        {/* Member activity stats */}
+        <MemberActivityGrid householdId={household.id} />
 
         <h2 className="text-2xl font-semibold text-slate-900 mb-8">{title}</h2>
 
