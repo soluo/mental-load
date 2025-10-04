@@ -5,6 +5,7 @@ import {formatCompletionDate} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
 import {Link} from "react-router-dom";
+import {Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup} from "@/components/ui/item";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -39,24 +40,23 @@ function TaskCompletionItem({
   duration,
 }: TaskCompletionItemProps) {
   return (
-    <div className="bg-white/80 flex gap-2 p-1.5 border border-gray-300 rounded-full">
-      <div className="shrink-0 flex items-center justify-center size-12 bg-gray-100/10 rounded-full">
-        <CheckIcon className="h-5 w-5 text-lime-500"/>
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm/6 font-medium text-slate-900 truncate">{taskTitle}</div>
-        <div className="flex items-baseline gap-1.5 text-sm text-slate-500">
-          <span>{memberName}</span>
-          <span>•</span>
-          <span className="text-sm text-slate-500">
-            {formatCompletionDate(completedAt)}
-          </span>
-        </div>
-      </div>
-      <div className="shrink-0 flex items-center justify-center size-12 xbg-gray-300/10 rounded-full">
-        {duration && <span className="text-xs text-slate-500">{duration} mn</span>}
-      </div>
-    </div>
+    <Item variant="outline" className="bg-white" size="sm">
+      <ItemMedia>
+        <CheckIcon size={20} className="text-lime-500"/>
+      </ItemMedia>
+
+      <ItemContent className="gap-0">
+        <ItemTitle className="leading-6">{taskTitle}</ItemTitle>
+        <ItemDescription className="leading-5">
+          {memberName} • {formatCompletionDate(completedAt)}
+        </ItemDescription>
+      </ItemContent>
+      {duration && (
+        <ItemActions>
+          <span className="text-xs text-muted-foreground">{duration} mn</span>
+        </ItemActions>
+      )}
+    </Item>
   );
 }
 
@@ -119,7 +119,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
             <p className="text-slate-600">Commencez par créer des tâches</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <ItemGroup className="space-y-2">
             {recentCompletions.map((completion) => (
               <TaskCompletionItem
                 key={completion._id}
@@ -129,7 +129,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
                 duration={completion.duration}
               />
             ))}
-          </div>
+          </ItemGroup>
         )}
       </div>
     </Page>
