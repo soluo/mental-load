@@ -150,7 +150,7 @@ export function TaskCompletionDetail({
           {canAssign && (
             <div className="mb-8">
               <Button
-                onClick={handleAssignTask}
+                onClick={() => void handleAssignTask()}
                 disabled={isSubmitting}
                 className="w-full"
                 variant="outline"
@@ -271,7 +271,7 @@ export function TaskCompletionDetail({
 
             {/* Submit button */}
             <Button
-              onClick={handleCompleteTask}
+              onClick={() => void handleCompleteTask()}
               disabled={isSubmitting}
               className="w-full"
               size="lg"

@@ -288,7 +288,7 @@ export function TaskCompletionViewer({
                     Annuler
                   </Button>
                   <Button
-                    onClick={handleSave}
+                    onClick={() => void handleSave()}
                     disabled={isSubmitting}
                     className="flex-1"
                     size="lg"
