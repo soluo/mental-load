@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export function HouseholdSetup() {
     }
   }, [firstName]);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
     if (!firstName.trim() || !householdName.trim()) return;
 
@@ -47,7 +47,7 @@ export function HouseholdSetup() {
 
   return (
     <Page className="py-8 bg-background">
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-full max-w-lg mx-auto">
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-6">
             <HomeIcon className="w-8 h-8 text-primary-foreground" />
@@ -60,10 +60,10 @@ export function HouseholdSetup() {
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className="max-w-md mx-auto space-y-8">
           {/* Create Household Form */}
           <div className="p-5">
-            <form onSubmit={handleCreate} className="space-y-4">
+            <form onSubmit={(e) => void handleCreate(e)} className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="firstName" className="">On t'appelle comment ?</Label>
                 <Input

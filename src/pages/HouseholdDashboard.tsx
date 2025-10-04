@@ -97,7 +97,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   if (recentCompletions === undefined) {
     return (
-      <div className="w-full max-w-2xl mx-auto py-8">
+      <div className="w-full max-w-lg mx-auto py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800 mx-auto"></div>
         </div>
@@ -116,7 +116,7 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
     <Page className="pt-14 pb-8">
       <header className="fixed top-0 inset-x-0 z-10 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
-      <div className="px-4 w-full max-w-2xl mx-auto">
+      <div className="px-4 w-full max-w-lg mx-auto">
         <h1 className="text-3xl font-bold text-stone-950 mb-6">Activité</h1>
 
         {/* Member activity stats */}
