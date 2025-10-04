@@ -7,6 +7,7 @@ import {api} from "../../convex/_generated/api";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
+import {Textarea} from "@/components/ui/textarea";
 
 interface TaskCompletionDetailProps {
   open: boolean;
@@ -257,12 +258,12 @@ export function TaskCompletionDetail({
               ) : (
                 <>
                   <Label htmlFor="notes" className="block mb-3">Note</Label>
-                  <textarea
+                  <Textarea
                     id="notes"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Ajoutez des détails sur cette réalisation..."
-                    className="w-full min-h-[100px] px-3 py-2 sm:text-sm rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2"
+                    className="min-h-[100px]"
                   />
                 </>
               )}
