@@ -6,6 +6,7 @@ import { api } from "../../convex/_generated/api";
 import { useActiveMember } from "@/contexts/MemberContext";
 import { useState } from "react";
 import { TaskCompletionDetail } from "@/components/TaskCompletionDetail";
+import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup } from "@/components/ui/item";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -35,23 +36,22 @@ interface TaskItemProps {
 
 function TaskItem({ task, onClick, subtitle, estimatedDuration }: TaskItemProps) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full text-left bg-gray-100/25 flex gap-2 p-1.5 border border-gray-300 rounded-full hover:bg-gray-100/50 transition-colors"
-    >
-      <div className="shrink-0 flex items-center justify-center size-12 bg-gray-500/10 rounded-full">
-        <CircleIcon className="h-5 w-5 text-slate-400" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm/6 font-medium text-slate-900 truncate">{task.title}</div>
-        <div className="text-sm text-slate-500">
-          {subtitle}
-        </div>
-      </div>
-      <div className="shrink-0 flex items-center justify-center size-12 rounded-full">
-        {estimatedDuration && <span className="text-xs text-slate-500">{estimatedDuration} mn</span>}
-      </div>
-    </button>
+    <Item asChild variant="outline" size="sm">
+      <button onClick={onClick} className="w-full text-left bg-white">
+        <ItemMedia>
+          <CircleIcon size={20} className="text-primary" />
+        </ItemMedia>
+        <ItemContent className="gap-0">
+          <ItemTitle className="leading-6">{task.title}</ItemTitle>
+          <ItemDescription className="leading-5">{subtitle}</ItemDescription>
+        </ItemContent>
+        {estimatedDuration && (
+          <ItemActions>
+            <span className="text-xs text-muted-foreground">~{estimatedDuration} mn</span>
+          </ItemActions>
+        )}
+      </button>
+    </Item>
   );
 }
 
@@ -96,7 +96,7 @@ function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle, est
       {tasks.length === 0 ? (
         <p className="text-slate-500 text-sm px-2">{emptyMessage}</p>
       ) : (
-        <div className="space-y-2">
+        <ItemGroup className="space-y-2">
           {tasks.map((task) => (
             <TaskItem
               key={task._id}
@@ -106,7 +106,7 @@ function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle, est
               estimatedDuration={estimatedDuration}
             />
           ))}
-        </div>
+        </ItemGroup>
       )}
     </div>
   );
