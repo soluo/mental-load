@@ -148,7 +148,7 @@ export function GetItDone({ household }: GetItDoneProps) {
 
   return (
     <Page className="pt-14 pb-8">
-      <header className="fixed top-0 inset-x-0 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
+      <header className="fixed top-0 inset-x-0 z-10 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
       <div className="px-4 w-full max-w-2xl mx-auto">
         <h1 className="px-2 mb-8 text-3xl font-semibold text-stone-950">
