@@ -92,7 +92,7 @@ interface TaskSectionProps {
 function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle, estimatedDuration }: TaskSectionProps) {
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-semibold text-slate-900 mb-3 px-2">{title}</h3>
+      <h3 className="sticky z-10 top-12 bg-background text-xs uppercase text-primary pt-2 pb-3 px-2">{title}</h3>
       {tasks.length === 0 ? (
         <p className="text-slate-500 text-sm px-2">{emptyMessage}</p>
       ) : (
@@ -147,8 +147,8 @@ export function GetItDone({ household }: GetItDoneProps) {
   };
 
   return (
-    <Page className="pt-14 pb-8">
-      <header className="fixed top-0 inset-x-0 z-10 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
+    <Page className="pt-14 pb-8 isolate">
+      <header className="fixed top-0 inset-x-0 z-20 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
 
       <div className="px-4 w-full max-w-lg mx-auto">
         <h1 className="px-2 mb-8 text-3xl font-semibold text-stone-950">
