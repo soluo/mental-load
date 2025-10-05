@@ -1,13 +1,30 @@
 import {
   CircleCheckBig as GetItDoneIcon,
   Activity as ActivityIcon,
-  MenuSquareIcon as SettingsIcon
+  MenuSquareIcon as SettingsIcon, PlusIcon
 } from 'lucide-react';
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import {Button} from "@/components/ui/button.tsx";
+import {hapticFeedback} from "@/lib/utils";
 
 export function BottomNavbar() {
+  const location = useLocation();
+  const shouldShowButton = location.pathname === '/' || location.pathname === '/get-it-done';
+
   return (
     <div className="fixed bottom-0 inset-x-0">
+      {shouldShowButton && (
+        <div className="relative max-w-lg mx-auto px-4 flex justify-end">
+          {/* Floating Action Button */}
+          <Button
+            size="icon"
+            onClick={() => hapticFeedback(10)}
+            className="absolute right-4 bottom-4 z-10 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-115"
+          >
+            <PlusIcon className="size-6" strokeWidth={1.75} />
+          </Button>
+        </div>
+      )}
       <div className="bg-background/70 backdrop-blur border-t border-foreground/10">
         <nav className="max-w-lg mx-auto flex justify-around gap-2 py-2">
           <NavLink

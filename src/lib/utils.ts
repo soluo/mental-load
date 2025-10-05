@@ -33,3 +33,13 @@ export function formatCompletionDate(timestamp: number): string {
     return `${dayName.charAt(0).toUpperCase() + dayName.slice(1)} ${dayNum} ${monthShort}`;
   }
 }
+
+/**
+ * Trigger haptic feedback on mobile devices
+ * @param duration - Duration in milliseconds (default: 10ms for a light tap)
+ */
+export function hapticFeedback(duration = 10): void {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(duration);
+  }
+}
