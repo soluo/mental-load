@@ -182,6 +182,7 @@ export const createTask = mutation({
     type: v.union(v.literal("flexible"), v.literal("one-time")),
     dueDate: v.optional(v.number()),
     showBeforeDays: v.optional(v.number()),
+    estimatedDuration: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -215,6 +216,7 @@ export const createTask = mutation({
       description: args.description,
       type: args.type,
       scheduling,
+      estimatedDuration: args.estimatedDuration,
       isActive: true,
       isCompleted: false,
       createdAt: Date.now(),

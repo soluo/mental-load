@@ -51,7 +51,7 @@ function Content() {
     <>
       <Authenticated>
         {household ? (
-          <MainLayout>
+          <MainLayout householdId={household.id}>
             <Routes>
               <Route path="/" element={<HouseholdDashboard household={household} />} />
               <Route path="/get-it-done" element={<GetItDone household={household} />} />

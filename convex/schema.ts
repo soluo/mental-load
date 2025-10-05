@@ -29,6 +29,7 @@ const applicationTables = {
         showBeforeDays: v.optional(v.number()),
       })
     ),
+    estimatedDuration: v.optional(v.number()),
     isActive: v.boolean(),
     isCompleted: v.boolean(),
     completedAt: v.optional(v.number()),

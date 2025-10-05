@@ -86,10 +86,9 @@ interface TaskSectionProps {
   emptyMessage: string;
   onTaskClick: (task: Doc<"tasks">) => void;
   getSubtitle: (task: Doc<"tasks">) => string;
-  estimatedDuration?: number;
 }
 
-function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle, estimatedDuration }: TaskSectionProps) {
+function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle }: TaskSectionProps) {
   return (
     <div className="mb-8">
       <h3 className="sticky z-10 top-12 bg-background text-xs uppercase text-primary pt-2 pb-3 px-2">{title}</h3>
@@ -103,7 +102,7 @@ function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle, est
               task={task}
               onClick={() => onTaskClick(task)}
               subtitle={getSubtitle(task)}
-              estimatedDuration={estimatedDuration}
+              estimatedDuration={task.estimatedDuration}
             />
           ))}
         </ItemGroup>
@@ -163,7 +162,6 @@ export function GetItDone({ household }: GetItDoneProps) {
           getSubtitle={(task) =>
             task.scheduling?.dueDate ? formatDueDate(task.scheduling.dueDate) : ""
           }
-          estimatedDuration={15}
         />
 
         <TaskSection
@@ -175,7 +173,6 @@ export function GetItDone({ household }: GetItDoneProps) {
             const count = tasksForPicker.completionCounts[task._id] || 0;
             return `Vous l'avez fait ${count} fois`;
           }}
-          estimatedDuration={10}
         />
 
         <TaskSection
@@ -187,7 +184,6 @@ export function GetItDone({ household }: GetItDoneProps) {
             const count = tasksForPicker.completionCounts[task._id] || 0;
             return count === 0 ? "Vous ne l'avez jamais fait" : `Vous l'avez fait ${count} fois`;
           }}
-          estimatedDuration={10}
         />
       </div>
 

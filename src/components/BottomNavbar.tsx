@@ -6,10 +6,18 @@ import {
 import { NavLink, useLocation } from "react-router-dom";
 import {Button} from "@/components/ui/button.tsx";
 import {hapticFeedback} from "@/lib/utils";
+import { TaskCreationDrawer } from "@/components/TaskCreationDrawer";
+import { useState } from "react";
+import { Id } from "../../convex/_generated/dataModel";
 
-export function BottomNavbar() {
+interface BottomNavbarProps {
+  householdId?: Id<"households">;
+}
+
+export function BottomNavbar({ householdId }: BottomNavbarProps) {
   const location = useLocation();
   const shouldShowButton = location.pathname === '/' || location.pathname === '/get-it-done';
+  const [isTaskCreationOpen, setIsTaskCreationOpen] = useState(false);
 
   return (
     <div className="fixed bottom-0 inset-x-0">
@@ -18,7 +26,12 @@ export function BottomNavbar() {
           {/* Floating Action Button */}
           <Button
             size="icon"
-            onClick={() => hapticFeedback(10)}
+            onClick={() => {
+              hapticFeedback(10);
+              if (householdId) {
+                setIsTaskCreationOpen(true);
+              }
+            }}
             className="absolute right-4 bottom-4 z-10 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-115"
           >
             <PlusIcon className="size-6" strokeWidth={1.75} />
@@ -57,6 +70,15 @@ export function BottomNavbar() {
           </NavLink>
         </nav>
       </div>
+
+      {/* Task Creation Drawer */}
+      {householdId && (
+        <TaskCreationDrawer
+          open={isTaskCreationOpen}
+          onOpenChange={setIsTaskCreationOpen}
+          householdId={householdId}
+        />
+      )}
     </div>
   );
 }
