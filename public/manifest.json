@@ -4,8 +4,8 @@
   "description": "Application de partage de la charge mentale du foyer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fffafb",
-  "theme_color": "#fffafb",
+  "background_color": "#fbf6f8",
+  "theme_color": "#fbf6f8",
   "icons": [
     {
       "src": "/icon-192.png",

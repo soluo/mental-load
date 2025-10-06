@@ -5,7 +5,7 @@ import { FamilyManagement } from "@/components/FamilyManagement";
 import { HouseholdSetup } from "@/pages/HouseholdSetup";
 import { HouseholdDashboard } from "@/pages/HouseholdDashboard";
 import { GetItDone } from "@/pages/GetItDone";
-import { Member } from "@/pages/Member";
+import { Menu } from "@/pages/Menu";
 import { MainLayout } from "@/layouts/MainLayout";
 import { Toaster } from "sonner";
 import { Registration } from "@/pages/Registration.tsx";
@@ -81,7 +81,7 @@ function Content() {
             <Routes>
               <Route path="/" element={<HouseholdDashboard household={household} />} />
               <Route path="/get-it-done" element={<GetItDone household={household} />} />
-              <Route path="/member" element={<Member />} />
+              <Route path="/menu" element={<Menu />} />
               <Route path="/family" element={<FamilyManagement household={household} />} />
             </Routes>
           </MainLayout>
