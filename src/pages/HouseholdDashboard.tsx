@@ -1,11 +1,11 @@
 import {useQuery} from "convex/react";
 import {api} from "../../convex/_generated/api";
 import {Id} from "../../convex/_generated/dataModel";
-import {formatCompletionDate} from "@/lib/utils";
+import {formatCompletionDate, cn} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
 import {Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup} from "@/components/ui/item";
-import {useState} from "react";
+import {useState, useEffect, useRef} from "react";
 import {TaskCompletionViewer} from "@/components/TaskCompletionViewer";
 import {useActiveMember} from "@/contexts/MemberContext";
 import {MemberActivityGrid} from "@/components/MemberActivityGrid";
@@ -90,10 +90,30 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   const { activeMemberId } = useActiveMember();
   const [selectedCompletionId, setSelectedCompletionId] = useState<Id<"taskCompletions"> | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
 
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!titleRef.current || !headerRef.current) return;
+
+      const titleRect = titleRef.current.getBoundingClientRect();
+      const headerRect = headerRef.current.getBoundingClientRect();
+
+      // Détecter quand la baseline du texte (bas du span) franchit le bas du header
+      setIsHeaderVisible(titleRect.bottom < headerRect.bottom);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   if (recentCompletions === undefined) {
     return (
@@ -114,16 +134,34 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   return (
     <Page className="pt-[calc(env(safe-area-inset-top)+48px)] pb-8">
-      <header className="fixed top-0 inset-x-0 bg-background/90 backdrop-blur pt-[env(safe-area-inset-top)] z-10">
-        <div className="flex h-12 items-center  border-b border-foreground/10">
+      <header ref={headerRef} className="fixed top-0 inset-x-0 pt-[env(safe-area-inset-top)] z-10">
+        <div className={cn(
+          "absolute inset-0 bg-background transition-all duration-300",
+          isHeaderVisible && "bg-background/90 backdrop-blur"
+        )} />
+        <div className="relative flex h-12 items-center">
+          <div className={cn(
+            "absolute inset-x-0 bottom-0 border-b border-foreground/10 transition-opacity duration-300",
+            isHeaderVisible ? "opacity-100" : "opacity-0"
+          )} />
           <div className="flex-1"></div>
-          <div className="text-lg text-black font-semibold">Activité</div>
+          <div
+            data-dynamic
+            className={cn(
+              "text-lg text-black font-semibold transition-opacity duration-300",
+              isHeaderVisible ? "opacity-100" : "opacity-0"
+            )}
+          >
+            Activité
+          </div>
           <div className="flex-1"></div>
         </div>
       </header>
 
       <div className="pt-4 px-4 w-full max-w-lg mx-auto">
-        <h1 className="text-3xl font-bold text-stone-950 mb-6">Activité</h1>
+        <h1 className={cn("text-3xl font-bold text-stone-950 mb-6", isHeaderVisible && "invisible")}>
+          <span ref={titleRef} className="inline-block leading-none">Activité</span>
+        </h1>
 
         {/* Member activity stats */}
         <MemberActivityGrid householdId={household.id} />
