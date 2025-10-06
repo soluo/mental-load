@@ -60,7 +60,7 @@ export function BottomNavbar({ householdId }: BottomNavbarProps) {
             <span>Faire</span>
           </NavLink>
           <NavLink
-            to="/member"
+            to="/menu"
             className={({ isActive }) =>
               `flex-1 flex flex-col items-center gap-1 py-1 [&>span]:text-tiny ${isActive ? 'font-bold text-menu-active [&>svg]:text-menu-active-icon' : ''}`
             }
