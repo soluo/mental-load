@@ -113,10 +113,16 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   };
 
   return (
-    <Page className="pt-14 pb-8">
-      <header className="fixed top-0 inset-x-0 z-10 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
+    <Page className="pt-[calc(env(safe-area-inset-top)+48px)] pb-8">
+      <header className="fixed top-0 inset-x-0 bg-background/90 backdrop-blur pt-[env(safe-area-inset-top)] z-10">
+        <div className="flex h-12 items-center  border-b border-foreground/10">
+          <div className="flex-1"></div>
+          <div className="text-lg text-black font-semibold">Activité</div>
+          <div className="flex-1"></div>
+        </div>
+      </header>
 
-      <div className="px-4 w-full max-w-lg mx-auto">
+      <div className="pt-4 px-4 w-full max-w-lg mx-auto">
         <h1 className="text-3xl font-bold text-stone-950 mb-6">Activité</h1>
 
         {/* Member activity stats */}
