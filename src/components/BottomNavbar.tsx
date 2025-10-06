@@ -38,7 +38,7 @@ export function BottomNavbar({ householdId }: BottomNavbarProps) {
           </Button>
         </div>
       )}
-      <div className="bg-background/70 backdrop-blur border-t border-foreground/10 pwa-mobile:pb-[calc(env(safe-area-inset-bottom)+20px)]">
+      <div className="bg-background/70 backdrop-blur border-t border-foreground/10 pwa-mobile:pb-5">
         <nav className="max-w-lg mx-auto flex justify-around gap-2 py-2">
           <NavLink
             to="/"
