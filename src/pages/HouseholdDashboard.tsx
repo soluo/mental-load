@@ -97,11 +97,11 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   if (recentCompletions === undefined) {
     return (
-      <div className="w-full max-w-lg mx-auto py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800 mx-auto"></div>
+      <Page>
+        <div className="flex justify-center items-center h-dvh">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </div>
+      </Page>
     );
   }
 

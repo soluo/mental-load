@@ -10,7 +10,8 @@ import { MainLayout } from "@/layouts/MainLayout";
 import { Toaster } from "sonner";
 import { Registration } from "@/pages/Registration.tsx";
 import { useActiveMember } from "@/contexts/MemberContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { SplashScreen } from "@/components/SplashScreen";
 
 export default function App() {
   return (
@@ -25,6 +26,16 @@ function Content() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
   const household = useQuery(api.households.getCurrentHousehold);
   const { activeMemberId, setActiveMemberId } = useActiveMember();
+  const [showSplash, setShowSplash] = useState(() => {
+    // Show splash on full page reload (not on React Router navigation)
+    // sessionStorage clears when the app is closed or after period of inactivity
+    const hasShownSplash = sessionStorage.getItem("splash-shown");
+    if (!hasShownSplash) {
+      sessionStorage.setItem("splash-shown", "true");
+      return true;
+    }
+    return false;
+  });
 
   // Initialize activeMemberId when household is loaded
   useEffect(() => {
@@ -39,9 +50,24 @@ function Content() {
     }
   }, [household?.members, activeMemberId, setActiveMemberId]);
 
+  // Hide splash screen after 2 seconds
+  useEffect(() => {
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
+
+  // Show splash screen on first launch
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
   if (loggedInUser === undefined || household === undefined) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="flex justify-center items-center min-h-dvh">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-800"></div>
       </div>
     );
