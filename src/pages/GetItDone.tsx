@@ -4,9 +4,12 @@ import { Page } from "@/components/Page";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useActiveMember } from "@/contexts/MemberContext";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { TaskCompletionDetail } from "@/components/TaskCompletionDetail";
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup } from "@/components/ui/item";
+import { IOSHeader } from "@/components/IOSHeader";
+import { useIOSHeaderScroll } from "@/hooks/useIOSHeaderScroll";
+import { cn } from "@/lib/utils";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -91,7 +94,7 @@ interface TaskSectionProps {
 function TaskSection({ title, tasks, emptyMessage, onTaskClick, getSubtitle }: TaskSectionProps) {
   return (
     <div className="mb-8">
-      <h3 className="sticky z-10 top-12 bg-background text-xs uppercase text-primary pt-2 pb-3 px-2">{title}</h3>
+      <h3 className="sticky z-10 top-[calc(env(safe-area-inset-top)+48px)] bg-background text-xs uppercase text-primary pt-2 pb-3 px-2">{title}</h3>
       {tasks.length === 0 ? (
         <p className="text-slate-500 text-sm px-2">{emptyMessage}</p>
       ) : (
@@ -115,6 +118,8 @@ export function GetItDone({ household }: GetItDoneProps) {
   const { activeMemberId } = useActiveMember();
   const [selectedTask, setSelectedTask] = useState<Doc<"tasks"> | null>(null);
   const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const { isHeaderVisible, headerRef } = useIOSHeaderScroll(titleRef);
 
   const tasksForPicker = useQuery(
     api.tasks.getTasksForPicker,
@@ -146,12 +151,16 @@ export function GetItDone({ household }: GetItDoneProps) {
   };
 
   return (
-    <Page className="pt-14 pb-8 isolate">
-      <header className="fixed top-0 inset-x-0 z-20 flex h-12 bg-background/90 backdrop-blur border-b border-foreground/10"></header>
+    <Page className="pt-[calc(env(safe-area-inset-top)+48px)] pb-8 isolate">
+      <IOSHeader
+        title="Faire quelque chose"
+        headerRef={headerRef}
+        isHeaderVisible={isHeaderVisible}
+      />
 
       <div className="px-4 w-full max-w-lg mx-auto">
-        <h1 className="px-2 mb-8 text-3xl font-semibold text-stone-950">
-          Faire quelque chose
+        <h1 className={cn("px-2 mb-8 text-3xl font-semibold text-stone-950", isHeaderVisible && "invisible")}>
+          <span ref={titleRef} className="inline-block leading-none">Faire quelque chose</span>
         </h1>
 
         <TaskSection

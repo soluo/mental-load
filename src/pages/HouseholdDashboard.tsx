@@ -5,10 +5,12 @@ import {formatCompletionDate, cn} from "@/lib/utils";
 import {CheckIcon} from 'lucide-react';
 import {Page} from "@/components/Page.tsx";
 import {Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions, ItemGroup} from "@/components/ui/item";
-import {useState, useEffect, useRef} from "react";
+import {useState, useRef} from "react";
 import {TaskCompletionViewer} from "@/components/TaskCompletionViewer";
 import {useActiveMember} from "@/contexts/MemberContext";
 import {MemberActivityGrid} from "@/components/MemberActivityGrid";
+import {IOSHeader} from "@/components/IOSHeader";
+import {useIOSHeaderScroll} from "@/hooks/useIOSHeaderScroll";
 
 interface Member {
   id: Id<"householdMembers">;
@@ -90,30 +92,12 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
   const { activeMemberId } = useActiveMember();
   const [selectedCompletionId, setSelectedCompletionId] = useState<Id<"taskCompletions"> | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const titleRef = useRef<HTMLSpanElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
+  const { isHeaderVisible, headerRef } = useIOSHeaderScroll(titleRef);
 
   const recentCompletions = useQuery(api.taskCompletions.getRecentCompletions, {
     householdId: household.id,
   });
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!titleRef.current || !headerRef.current) return;
-
-      const titleRect = titleRef.current.getBoundingClientRect();
-      const headerRect = headerRef.current.getBoundingClientRect();
-
-      // Détecter quand la baseline du texte (bas du span) franchit le bas du header
-      setIsHeaderVisible(titleRect.bottom < headerRect.bottom);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Check initial state
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   if (recentCompletions === undefined) {
     return (
@@ -134,29 +118,11 @@ export function HouseholdDashboard({household}: HouseholdDashboardProps) {
 
   return (
     <Page className="pt-[calc(env(safe-area-inset-top)+48px)] pb-8">
-      <header ref={headerRef} className="fixed top-0 inset-x-0 pt-[env(safe-area-inset-top)] z-10">
-        <div className={cn(
-          "absolute inset-0 bg-background transition-all duration-300",
-          isHeaderVisible && "bg-background/90 backdrop-blur"
-        )} />
-        <div className="relative flex h-12 items-center">
-          <div className={cn(
-            "absolute inset-x-0 bottom-0 border-b border-foreground/10 transition-opacity duration-300",
-            isHeaderVisible ? "opacity-100" : "opacity-0"
-          )} />
-          <div className="flex-1"></div>
-          <div
-            data-dynamic
-            className={cn(
-              "text-lg text-black font-semibold transition-opacity duration-300",
-              isHeaderVisible ? "opacity-100" : "opacity-0"
-            )}
-          >
-            Activité
-          </div>
-          <div className="flex-1"></div>
-        </div>
-      </header>
+      <IOSHeader
+        title="Activité"
+        headerRef={headerRef}
+        isHeaderVisible={isHeaderVisible}
+      />
 
       <div className="pt-4 px-4 w-full max-w-lg mx-auto">
         <h1 className={cn("text-3xl font-bold text-stone-950 mb-6", isHeaderVisible && "invisible")}>
